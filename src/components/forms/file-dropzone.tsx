@@ -1,0 +1,229 @@
+"use client";
+
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Camera, CheckCircle2, FileText, Lock, RotateCcw, UploadCloud, X, AlertCircle } from "lucide-react";
+import { UPLOAD_LIMITS, acceptedExtensions } from "@/lib/validation/upload";
+import { cn, formatBytes } from "@/lib/utils";
+
+export type UploadItem = {
+  key: string;
+  file: File;
+  progress: number;
+  status: "uploading" | "done" | "error";
+  id?: string;
+  error?: string;
+};
+
+type Props = {
+  category?: string;
+  onChange?: (ids: string[], items: UploadItem[]) => void;
+  onBusyChange?: (busy: boolean) => void;
+  compact?: boolean;
+  label?: string;
+};
+
+function uploadFile(file: File, category: string, onProgress: (p: number) => void) {
+  return new Promise<{ id: string }>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const body = new FormData();
+    body.append("file", file);
+    body.append("category", category);
+    xhr.open("POST", "/api/uploads");
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100));
+    xhr.onload = () => {
+      try {
+        const json = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300 && json.ok) resolve({ id: json.id });
+        else reject(new Error(json.error || "Upload failed"));
+      } catch {
+        reject(new Error("Upload failed"));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Network error — check your connection"));
+    xhr.send(body);
+  });
+}
+
+export function FileDropzone({ category = "other", onChange, onBusyChange, compact = false, label = "Upload documents" }: Props) {
+  const [items, setItems] = useState<UploadItem[]>([]);
+  const [dragging, setDragging] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const descId = useId();
+
+  useEffect(() => {
+    onChange?.(items.filter((i) => i.status === "done" && i.id).map((i) => i.id!), items);
+    onBusyChange?.(items.some((i) => i.status === "uploading"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
+
+  const update = (key: string, patch: Partial<UploadItem>) =>
+    setItems((prev) => prev.map((it) => (it.key === key ? { ...it, ...patch } : it)));
+
+  const start = useCallback(
+    (item: UploadItem) => {
+      uploadFile(item.file, category, (p) => update(item.key, { progress: p }))
+        .then(({ id }) => update(item.key, { status: "done", progress: 100, id }))
+        .catch((e: Error) => update(item.key, { status: "error", error: e.message }));
+    },
+    [category],
+  );
+
+  const addFiles = (list: FileList | File[]) => {
+    setNotice(null);
+    const files = Array.from(list);
+    const room = UPLOAD_LIMITS.maxFiles - items.length;
+    if (room <= 0) {
+      setNotice(`You can upload up to ${UPLOAD_LIMITS.maxFiles} files.`);
+      return;
+    }
+    const next: UploadItem[] = [];
+    for (const file of files.slice(0, room)) {
+      const ext = `.${file.name.split(".").pop()?.toLowerCase()}`;
+      const key = `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`;
+      if (!acceptedExtensions.includes(ext)) {
+        next.push({ key, file, progress: 0, status: "error", error: "Unsupported file type" });
+      } else if (file.size > UPLOAD_LIMITS.maxBytes) {
+        next.push({ key, file, progress: 0, status: "error", error: "Larger than 15 MB" });
+      } else {
+        next.push({ key, file, progress: 0, status: "uploading" });
+      }
+    }
+    if (files.length > room) setNotice(`Only the first ${room} file(s) were added (limit ${UPLOAD_LIMITS.maxFiles}).`);
+    setItems((prev) => [...prev, ...next]);
+    next.filter((n) => n.status === "uploading").forEach(start);
+  };
+
+  const retry = (item: UploadItem) => {
+    update(item.key, { status: "uploading", progress: 0, error: undefined });
+    start({ ...item, status: "uploading", progress: 0 });
+  };
+
+  return (
+    <div>
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
+        }}
+        className={cn(
+          "relative rounded-2xl border-2 border-dashed text-center transition-colors",
+          compact ? "p-5" : "p-8 sm:p-10",
+          dragging ? "border-brand-600 bg-brand-50" : "border-line-strong bg-canvas/60 hover:border-brand-200",
+        )}
+      >
+        <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-white text-brand-600 shadow-[var(--shadow-soft)]">
+          <UploadCloud className="size-6" strokeWidth={1.75} aria-hidden />
+        </span>
+        <p className="mt-4 font-semibold text-navy-900">
+          <span className="hidden sm:inline">Drag & drop files here, or </span>
+          <button type="button" onClick={() => inputRef.current?.click()} className="text-brand-600 underline-offset-4 hover:underline">
+            <span className="sm:hidden">Choose files</span>
+            <span className="hidden sm:inline">browse</span>
+          </button>
+        </p>
+        <p id={descId} className="mt-1 text-[13px] text-muted">
+          PDF, JPG, PNG, HEIC, DOC, XLS or CSV · up to 15 MB each · max {UPLOAD_LIMITS.maxFiles} files
+        </p>
+        <div className="mt-4 flex justify-center sm:hidden">
+          <button
+            type="button"
+            onClick={() => cameraRef.current?.click()}
+            className="inline-flex h-10 items-center gap-2 rounded-xl border border-line-strong bg-white px-4 text-sm font-semibold text-navy-900"
+          >
+            <Camera className="size-4" aria-hidden /> Take a photo
+          </button>
+        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          className="sr-only"
+          aria-label={label}
+          aria-describedby={descId}
+          accept={acceptedExtensions.join(",")}
+          onChange={(e) => {
+            if (e.target.files) addFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden
+          onChange={(e) => {
+            if (e.target.files) addFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+      </div>
+
+      {notice && (
+        <p className="mt-3 flex items-center gap-2 text-sm text-warn-700" role="status">
+          <AlertCircle className="size-4" aria-hidden /> {notice}
+        </p>
+      )}
+
+      {items.length > 0 && (
+        <ul className="mt-4 space-y-2" aria-live="polite">
+          {items.map((it) => (
+            <li key={it.key} className="flex items-center gap-3 rounded-xl border border-line bg-white p-3">
+              <span
+                className={cn(
+                  "grid size-9 shrink-0 place-items-center rounded-lg",
+                  it.status === "error" ? "bg-danger-50 text-danger-600" : it.status === "done" ? "bg-success-50 text-success-600" : "bg-brand-50 text-brand-600",
+                )}
+              >
+                {it.status === "done" ? <CheckCircle2 className="size-[18px]" aria-hidden /> : it.status === "error" ? <AlertCircle className="size-[18px]" aria-hidden /> : <FileText className="size-[18px]" aria-hidden />}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate text-sm font-medium text-navy-900">{it.file.name}</p>
+                  <span className="shrink-0 text-xs text-muted">
+                    {it.status === "uploading" ? `${it.progress}%` : it.status === "done" ? "Uploaded" : formatBytes(it.file.size)}
+                  </span>
+                </div>
+                {it.status === "error" ? (
+                  <p className="mt-0.5 text-xs text-danger-600">{it.error}</p>
+                ) : (
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-canvas" role="progressbar" aria-valuenow={it.progress} aria-valuemin={0} aria-valuemax={100} aria-label={`Uploading ${it.file.name}`}>
+                    <div className={cn("h-full rounded-full transition-all duration-300", it.status === "done" ? "bg-success-600" : "bg-brand-600")} style={{ width: `${it.progress}%` }} />
+                  </div>
+                )}
+              </div>
+              {it.status === "error" && acceptedExtensions.includes(`.${it.file.name.split(".").pop()?.toLowerCase()}`) && it.file.size <= UPLOAD_LIMITS.maxBytes && (
+                <button type="button" onClick={() => retry(it)} className="grid size-8 place-items-center rounded-lg text-muted hover:bg-canvas hover:text-navy-900" aria-label={`Retry ${it.file.name}`}>
+                  <RotateCcw className="size-4" aria-hidden />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setItems((prev) => prev.filter((p) => p.key !== it.key))}
+                className="grid size-8 place-items-center rounded-lg text-muted hover:bg-canvas hover:text-navy-900"
+                aria-label={`Remove ${it.file.name}`}
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="mt-3 flex items-center gap-2 text-xs text-muted">
+        <Lock className="size-3.5 text-success-600" aria-hidden />
+        Files are sent over an encrypted (HTTPS) connection and stored privately — never on public pages.
+      </p>
+    </div>
+  );
+}
