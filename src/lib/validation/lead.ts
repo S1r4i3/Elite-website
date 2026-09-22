@@ -25,7 +25,6 @@ export const leadSchema = z.object({
   taxYear: z.string().trim().min(1, "Please choose a tax year").max(30),
   message: z.string().trim().max(2000, "Please keep your message under 2,000 characters").optional().or(z.literal("")),
   documentIds: z.array(z.string().uuid()).max(10).optional(),
-  consent: z.literal(true, { error: "Please agree so we can contact you" }),
   source: z.string().max(120).optional(),
   estimate: z.record(z.string(), z.any()).optional(),
   /** Honeypot — must stay empty */

@@ -59,6 +59,7 @@ export default async function AdminCustomerPage({ params }: { params: Promise<{ 
             </h1>
             <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
               {[
+                ["Client ID", c.clientId],
                 ["Email", c.email],
                 ["Phone", c.phone],
                 ["Date of birth", c.dob],

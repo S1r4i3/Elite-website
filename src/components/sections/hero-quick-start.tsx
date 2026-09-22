@@ -69,7 +69,7 @@ export function HeroQuickStart() {
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-xs text-white/65">
             <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="size-4 text-brand-300" aria-hidden /> Free consultation · Secure document upload
+              <ShieldCheck className="size-4 text-brand-300" aria-hidden /> Free consultation · Secure client portal
             </span>
             {rating && (
               <span className="inline-flex items-center gap-1.5">

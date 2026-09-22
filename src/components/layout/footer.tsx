@@ -36,7 +36,7 @@ const cols = [
       { label: "FAQs", href: "/faq" },
       { label: "Reviews", href: "/reviews" },
       { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
+      { label: "Terms & Conditions", href: "/terms" },
     ],
   },
 ];
@@ -107,7 +107,7 @@ export function Footer() {
         </div>
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 text-[13px] text-white/50 md:flex-row md:items-center md:justify-between">
           <p>
-            © {new Date().getFullYear()} {site.legalName}. {site.name}. All rights reserved.
+            © Elite B Tax Services. All rights reserved.
           </p>
           <p className="max-w-xl md:text-right">
             Information on this site is general in nature and is not tax, legal or financial advice for your specific situation.

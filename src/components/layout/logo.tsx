@@ -27,7 +27,7 @@ export function Logo({ light = false, className, priority = false, showText = tr
           ELITE <span className="text-brand-600">B</span> TAX
         </span>
         <span className={cn("mt-1 whitespace-nowrap text-[10.5px] font-semibold uppercase tracking-[0.22em]", light ? "text-white/60" : "text-muted")}>
-          Tax Services
+          Services
         </span>
       </span>
       )}

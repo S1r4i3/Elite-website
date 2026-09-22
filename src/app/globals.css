@@ -277,6 +277,8 @@ html.custom-cursor-on [contenteditable="true"] { cursor: auto !important; }
 .cursor-ring[data-state="text"] { opacity: 0 !important; }
 .cursor-ring.is-down { width: 28px; height: 28px; background: rgb(200 16 46 / 0.25); }
 
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
 /* Wrong-code shake */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }

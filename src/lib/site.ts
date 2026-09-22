@@ -21,6 +21,11 @@ export const site = {
     e164: "+13022022139",
   },
   email: "support@elitebtax.com",
+  whatsapp: {
+    number: "919912762149",
+    display: "+91 99127 62149",
+    message: "Hi Elite B Tax Services, I'd like help with my taxes.",
+  },
   address: {
     street: "8 The Green, Ste A",
     city: "Dover",

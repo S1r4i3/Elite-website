@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { VerifiedToast } from "@/components/auth/verified-toast";
 import { MotionEffects } from "@/components/effects/motion-effects";
 import { CustomCursor } from "@/components/effects/custom-cursor";
+import { InquiryPopup } from "@/components/layout/inquiry-popup";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <MobileCta />
       <MotionEffects />
       <CustomCursor />
+      <InquiryPopup />
     </>
   );
 }

@@ -31,6 +31,18 @@ ALTER TABLE customers ADD COLUMN IF NOT EXISTS country text;
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS address text;
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_hash text;
 CREATE UNIQUE INDEX IF NOT EXISTS customers_email_lower_idx ON customers (lower(email));
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS client_id text;
+CREATE UNIQUE INDEX IF NOT EXISTS customers_client_id_idx ON customers (client_id);
+
+-- Visitor inquiries from the website pop-up form
+CREATE TABLE IF NOT EXISTS inquiries (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name       text NOT NULL,
+  phone      text NOT NULL,
+  message    text,
+  page       text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
 
 CREATE TABLE IF NOT EXISTS auth_otps (
   email         text NOT NULL,

@@ -1,7 +1,6 @@
 import { Clock, MessagesSquare, Smartphone, ShieldCheck } from "lucide-react";
 import { PageHero } from "@/components/sections/page-hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
-import { SecureUpload } from "@/components/sections/secure-upload";
 import { FaqSection } from "@/components/sections/faq-section";
 import { FinalCta } from "@/components/sections/final-cta";
 import { SectionHeader } from "@/components/sections/section-header";
@@ -50,7 +49,6 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
-      <SecureUpload />
       <FaqSection faqs={faqs} />
       <FinalCta />
     </>

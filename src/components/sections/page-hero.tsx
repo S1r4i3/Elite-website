@@ -17,7 +17,7 @@ export function PageHero({
 }: {
   eyebrow?: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   crumbs: Crumb[];
   primary?: { label: string; href: string } | null;
   secondary?: { label: string; href: string } | null;
@@ -34,7 +34,7 @@ export function PageHero({
           <div className={aside ? "lg:col-span-7" : "max-w-3xl"}>
             {eyebrow && <p className="eyebrow">{eyebrow}</p>}
             <h1 className="mt-3 text-[34px] font-extrabold leading-[1.08] sm:text-5xl lg:text-[56px]">{title}</h1>
-            <p className="lead-copy mt-5 max-w-2xl">{subtitle}</p>
+            {subtitle && <p className="lead-copy mt-5 max-w-2xl">{subtitle}</p>}
             {(primary || secondary) && (
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 {primary && (

@@ -127,6 +127,11 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
               <p className="truncate text-xs text-white/55">{customer.email}</p>
             </div>
           </div>
+          {customer.clientId && (
+            <p className="mt-3 flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-xs text-white/60">
+              Client ID <span className="font-mono text-[13px] font-semibold tracking-wide text-white">{customer.clientId}</span>
+            </p>
+          )}
           <div className="mt-3 grid grid-cols-2 gap-2">
             <Link href="/" className="inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/10 hover:text-white">
               <Globe className="size-4" aria-hidden /> Website
@@ -143,13 +148,18 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
             <div>
               <p className="text-sm text-muted">
                 {slug === "" ? "Welcome back," : "Client portal"} {slug === "" && <span className="font-semibold text-navy-900">{customer.firstName}</span>}
+                {customer.clientId && (
+                  <span className="ml-2 inline-flex items-center rounded-full border border-line bg-white px-2.5 py-0.5 font-mono text-xs font-semibold text-navy-900">
+                    {customer.clientId}
+                  </span>
+                )}
               </p>
               <h1 className="mt-1 flex items-center gap-3 text-2xl font-extrabold sm:text-3xl">
                 <CurrentIcon className="size-7 text-brand-600" aria-hidden /> {current.label}
               </h1>
               <p className="mt-2 max-w-2xl text-muted">{current.description}</p>
             </div>
-            {slug !== "upload-documents" && slug !== "profile" && (
+            {slug === "" && (
               <Button asChild className="btn-shine">
                 <Link href="/dashboard/upload-documents">
                   <UploadCloud aria-hidden /> Upload documents
@@ -319,7 +329,7 @@ function MyDocuments({ docs }: { docs: PortalDocument[] }) {
   if (docs.length === 0) {
     return (
       <div className="card">
-        <Empty icon={FolderOpen} title="No documents yet" body="Documents you upload will appear here." cta={{ href: "/dashboard/upload-documents", label: "Upload documents" }} />
+        <Empty icon={FolderOpen} title="No documents yet" body="Documents you upload from the Upload Documents page will appear here." />
       </div>
     );
   }
@@ -359,7 +369,6 @@ function Drafts({ drafts }: { drafts: PortalDocument[] }) {
           icon={Calculator}
           title="No draft estimate yet"
           body="Once we've reviewed your documents, your tax professional will share a draft estimate here for you to review and approve."
-          cta={{ href: "/dashboard/upload-documents", label: "Upload documents" }}
         />
       </div>
     );

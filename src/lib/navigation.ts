@@ -4,10 +4,10 @@ export type NavItem = NavLink & { children?: NavLink[] };
 export const taxServiceLinks: NavLink[] = [
   { label: "Federal Tax Filing", href: "/federal-tax-filing", description: "Individual 1040 & 1040-NR returns", icon: "FileText" },
   { label: "State Tax Filing", href: "/state-tax-filing", description: "Resident, part-year & multi-state", icon: "MapPin" },
-  { label: "FBAR", href: "/fbar", description: "FinCEN 114 foreign account reports", icon: "Globe2" },
-  { label: "FATCA", href: "/fatca", description: "Form 8938 foreign asset reporting", icon: "Landmark" },
-  { label: "ITIN Processing", href: "/itin", description: "Form W-7 applications & renewals", icon: "IdCard" },
-  { label: "Tax Amendments", href: "/tax-amendment", description: "Correct a filed return (1040-X)", icon: "FilePen" },
+  { label: "FBAR", href: "/fbar", description: "", icon: "Globe2" },
+  { label: "FATCA", href: "/fatca", description: "", icon: "Landmark" },
+  { label: "ITIN Processing", href: "/itin", description: "", icon: "IdCard" },
+  { label: "Tax Amendments", href: "/tax-amendment", description: "", icon: "FilePen" },
   { label: "IRS Representation", href: "/irs-representation", description: "Notices, letters & audit support", icon: "ShieldCheck" },
 ];
 
@@ -26,14 +26,6 @@ export const mainNav: NavItem[] = [
   { label: "Indian Tax Services", href: "/indian-tax-services" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About", href: "/about" },
-  {
-    label: "Resources",
-    href: "/faq",
-    children: [
-      { label: "FAQs", href: "/faq", description: "Answers to common tax questions", icon: "HelpCircle" },
-      { label: "Reviews", href: "/reviews", description: "What clients say about us", icon: "Star" },
-    ],
-  },
   { label: "Contact", href: "/contact" },
 ];
 

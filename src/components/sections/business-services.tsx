@@ -81,7 +81,7 @@ export function BusinessServices() {
             dark
             align="left"
             eyebrow="Business services"
-            title={<span id="business-heading">Tax & Business Support for Growing Companies</span>}
+            title={<span id="business-heading">Tax & Individual Business Tax Services</span>}
             subtitle="From forming your company to payroll and year-end returns — one team that understands both your books and your taxes."
           />
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">

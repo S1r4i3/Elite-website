@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import type { Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, NewPortalDocument, OtpPurpose, OtpRecord, PortalDocKind, PortalDocument, Repository } from "./types";
+import type { Inquiry, NewInquiry, Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, NewPortalDocument, OtpPurpose, OtpRecord, PortalDocKind, PortalDocument, Repository } from "./types";
 import { leadStatuses } from "./types";
 
 const globalForPg = globalThis as unknown as { __elitePgPool?: Pool };
@@ -47,6 +47,7 @@ const toDoc = (r: any): DocumentRecord => ({
 
 const toCustomer = (r: any): Customer => ({
   id: r.id,
+  clientId: r.client_id ?? null,
   firstName: r.first_name,
   lastName: r.last_name,
   email: r.email,
@@ -188,6 +189,51 @@ export class PostgresRepository implements Repository {
     return rows[0] ? toCustomer(rows[0]) : null;
   }
 
+  async assignClientId(id: string) {
+    const client = await pool().connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("SELECT pg_advisory_xact_lock(724201)"); // serialize ID allocation
+      const cur = await client.query(`SELECT client_id, created_at FROM customers WHERE id = $1`, [id]);
+      if (!cur.rows[0]) {
+        await client.query("ROLLBACK");
+        return null;
+      }
+      if (cur.rows[0].client_id) {
+        await client.query("COMMIT");
+        return cur.rows[0].client_id as string;
+      }
+      const prefix = `EBT-${new Date(cur.rows[0].created_at).getFullYear()}-`;
+      const max = await client.query(
+        `SELECT coalesce(max(substring(client_id from ${prefix.length + 1})::int), 0) AS n FROM customers WHERE client_id LIKE $1`,
+        [`${prefix}%`],
+      );
+      const clientId = `${prefix}${String(Number(max.rows[0].n) + 1).padStart(4, "0")}`;
+      await client.query(`UPDATE customers SET client_id = $2 WHERE id = $1`, [id, clientId]);
+      await client.query("COMMIT");
+      return clientId;
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  async createInquiry(i: NewInquiry) {
+    const { rows } = await pool().query(
+      `INSERT INTO inquiries (name, phone, message, page) VALUES ($1,$2,$3,$4) RETURNING *`,
+      [i.name, i.phone, i.message, i.page],
+    );
+    const r = rows[0];
+    return { id: r.id, name: r.name, phone: r.phone, message: r.message, page: r.page, createdAt: new Date(r.created_at).toISOString() };
+  }
+
+  async listInquiries(limit = 200) {
+    const { rows } = await pool().query(`SELECT * FROM inquiries ORDER BY created_at DESC LIMIT ${Number(limit)}`);
+    return rows.map((r) => ({ id: r.id, name: r.name, phone: r.phone, message: r.message, page: r.page, createdAt: new Date(r.created_at).toISOString() }));
+  }
+
   async createCustomer(c: NewCustomer) {
     try {
       const { rows } = await pool().query(
@@ -195,7 +241,9 @@ export class PostgresRepository implements Repository {
          VALUES ($1,$2,lower($3),$4,$5,$6,$7,$8,$9,now(),now()) RETURNING *`,
         [c.firstName, c.lastName, c.email, c.phone, c.dob ?? null, c.state ?? null, c.country ?? null, c.address ?? null, c.passwordHash ?? null],
       );
-      return toCustomer(rows[0]);
+      const created = toCustomer(rows[0]);
+      created.clientId = await this.assignClientId(created.id);
+      return created;
     } catch (e) {
       if ((e as { code?: string }).code === "23505") throw new Error("EMAIL_EXISTS");
       throw e;

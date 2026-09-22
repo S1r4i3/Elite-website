@@ -39,6 +39,8 @@ export type ListLeadsOptions = { status?: LeadStatus; search?: string; limit?: n
 
 export type Customer = {
   id: string;
+  /** Human-friendly unique client number, e.g. EBT-2026-0001 */
+  clientId: string | null;
   firstName: string;
   lastName: string;
   email: string;
@@ -94,6 +96,10 @@ export type PortalDocument = {
 export type NewPortalDocument = Omit<PortalDocument, "createdAt" | "updatedAt" | "clientComment" | "status"> &
   Partial<Pick<PortalDocument, "status">>;
 
+/** Visitor inquiry from the website pop-up form. */
+export type Inquiry = { id: string; name: string; phone: string; message: string | null; page: string | null; createdAt: string };
+export type NewInquiry = Omit<Inquiry, "id" | "createdAt">;
+
 /** Persistence contract. Swap implementations without touching routes or UI. */
 export interface Repository {
   readonly driver: "postgres" | "file";
@@ -113,6 +119,11 @@ export interface Repository {
   setCustomerPassword(id: string, passwordHash: string): Promise<void>;
   updateCustomerProfile(id: string, patch: Partial<Pick<Customer, "firstName" | "lastName" | "phone" | "dob" | "state" | "country" | "address">>): Promise<Customer | null>;
   listCustomers(search?: string): Promise<Customer[]>;
+  /** Gives the customer a permanent client ID (EBT-YYYY-NNNN) if they don't have one yet; returns it. */
+  assignClientId(id: string): Promise<string | null>;
+
+  createInquiry(i: NewInquiry): Promise<Inquiry>;
+  listInquiries(limit?: number): Promise<Inquiry[]>;
 
   // Client portal documents
   createPortalDocument(doc: NewPortalDocument): Promise<PortalDocument>;

@@ -40,7 +40,7 @@ export function Hero() {
             </Button>
           </div>
           <ul className="stagger mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/70">
-            {["Registered IRS e-file provider (ERO)", "Federal, state & international", "Upload from your phone"].map((t) => (
+            {["Registered IRS e-file provider (ERO)", "Federal, state & international", "Secure client portal"].map((t) => (
               <li key={t} className="flex items-center gap-1.5">
                 <CheckCircle2 className="size-4 text-brand-300" aria-hidden /> {t}
               </li>

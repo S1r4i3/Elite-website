@@ -1,10 +1,10 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, NewPortalDocument, OtpPurpose, OtpRecord, PortalDocKind, PortalDocument, Repository } from "./types";
+import type { Inquiry, NewInquiry, Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, NewPortalDocument, OtpPurpose, OtpRecord, PortalDocKind, PortalDocument, Repository } from "./types";
 import { leadStatuses } from "./types";
 
-type DbShape = { leads: Lead[]; documents: DocumentRecord[]; customers?: Customer[]; otps?: OtpRecord[]; portalDocuments?: PortalDocument[] };
+type DbShape = { leads: Lead[]; documents: DocumentRecord[]; customers?: Customer[]; otps?: OtpRecord[]; portalDocuments?: PortalDocument[]; inquiries?: Inquiry[] };
 
 const DATA_DIR = path.resolve(process.cwd(), ".data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
@@ -38,8 +38,18 @@ function mutate<T>(fn: (db: DbShape) => T | Promise<T>): Promise<T> {
   return run;
 }
 
+/** Next sequential client ID for the year, e.g. EBT-2026-0007. */
+function nextClientId(customers: Customer[], when: Date) {
+  const prefix = `EBT-${when.getFullYear()}-`;
+  let max = 0;
+  for (const c of customers) {
+    if (c.clientId?.startsWith(prefix)) max = Math.max(max, parseInt(c.clientId.slice(prefix.length), 10) || 0);
+  }
+  return `${prefix}${String(max + 1).padStart(4, "0")}`;
+}
+
 const normalizeCustomer = (c?: Customer): Customer | null =>
-  c ? Object.assign({ dob: null, state: null, country: null, address: null, passwordHash: null }, c) : null;
+  c ? Object.assign({ clientId: null, dob: null, state: null, country: null, address: null, passwordHash: null }, c) : null;
 
 /** Development / single-instance store. Use PostgreSQL in production. */
 export class FileRepository implements Repository {
@@ -123,6 +133,7 @@ export class FileRepository implements Repository {
       if (db.customers.some((c) => c.email === email)) throw new Error("EMAIL_EXISTS");
       const now = new Date().toISOString();
       const customer: Customer = {
+        clientId: nextClientId(db.customers, new Date()),
         dob: null,
         state: null,
         country: null,
@@ -171,6 +182,28 @@ export class FileRepository implements Repository {
       list = list.filter((c) => `${c.firstName} ${c.lastName} ${c.email} ${c.phone ?? ""}`.toLowerCase().includes(q));
     }
     return list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  assignClientId(id: string) {
+    return mutate((db) => {
+      const c = db.customers?.find((x) => x.id === id);
+      if (!c) return null;
+      if (!c.clientId) c.clientId = nextClientId(db.customers ?? [], new Date(c.createdAt));
+      return c.clientId;
+    });
+  }
+
+  createInquiry(input: NewInquiry) {
+    return mutate((db) => {
+      const inq: Inquiry = { ...input, id: randomUUID(), createdAt: new Date().toISOString() };
+      (db.inquiries ??= []).unshift(inq);
+      return inq;
+    });
+  }
+
+  async listInquiries(limit = 200) {
+    const db = await read();
+    return (db.inquiries ?? []).slice(0, limit);
   }
 
   createPortalDocument(input: NewPortalDocument) {

@@ -80,7 +80,7 @@ export function Header() {
         Skip to content
       </a>
       <div className="container-x flex h-16 items-center justify-between gap-4 lg:h-[72px]">
-        <Logo priority showText={false} />
+        <Logo priority />
 
         <nav ref={navRef} aria-label="Main" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">

@@ -10,7 +10,6 @@ import { serviceOptions, customerTypeOptions } from "@/lib/services";
 import { Input, NativeSelect, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { FileDropzone } from "./file-dropzone";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -39,12 +38,10 @@ function Field({ id, label, error, children, optional }: { id: string; label: st
   );
 }
 
-export function LeadForm({ defaultService, source, estimate, submitLabel = "Submit Request", className, showUpload = true }: Props) {
+export function LeadForm({ defaultService, source, estimate, submitLabel = "Submit Request", className, showUpload: _showUpload = false }: Props) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [serverError, setServerError] = useState<string | null>(null);
-  const [uploadsBusy, setUploadsBusy] = useState(false);
-  const [pendingDocs, setPendingDocs] = useState<string[]>([]);
-  const [newDocs, setNewDocs] = useState<string[]>([]);
+  const uploadsBusy = false;
 
   const validService = serviceOptions.some((o) => o.value === defaultService) ? defaultService : "";
   const {
@@ -67,24 +64,12 @@ export function LeadForm({ defaultService, source, estimate, submitLabel = "Subm
       taxYear: "",
       message: "",
       documentIds: [],
-      consent: false as unknown as true,
       source,
       estimate,
       website: "",
     },
   });
 
-  // Documents uploaded earlier in the session (e.g. homepage upload section) are attached automatically.
-  useEffect(() => {
-    try {
-      const ids = JSON.parse(sessionStorage.getItem("elite:pendingDocs") || "[]");
-      if (Array.isArray(ids)) setPendingDocs(ids.filter((x) => typeof x === "string").slice(0, 10));
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    setValue("documentIds", [...pendingDocs, ...newDocs].slice(0, 10));
-  }, [pendingDocs, newDocs, setValue]);
 
   const onSubmit = async (data: LeadData) => {
     setStatus("submitting");
@@ -106,9 +91,6 @@ export function LeadForm({ defaultService, source, estimate, submitLabel = "Subm
       }
       setStatus("success");
       reset();
-      try {
-        sessionStorage.removeItem("elite:pendingDocs");
-      } catch {}
     } catch (e) {
       setServerError((e as Error).message);
       setStatus("error");
@@ -216,19 +198,6 @@ export function LeadForm({ defaultService, source, estimate, submitLabel = "Subm
             <Textarea id="message" rows={4} placeholder="Tell us briefly about your situation…" {...register("message")} {...aria("message")} />
           </Field>
         </div>
-        {showUpload && (
-          <div className="sm:col-span-2">
-            <p className="mb-1.5 text-sm font-medium text-navy-900">
-              Documents <span className="font-normal text-subtle">(optional)</span>
-            </p>
-            {pendingDocs.length > 0 && (
-              <p className="mb-3 flex items-center gap-2 rounded-xl bg-success-50 px-3 py-2.5 text-sm text-success-700">
-                <CheckCircle2 className="size-4" aria-hidden /> {pendingDocs.length} document{pendingDocs.length > 1 ? "s" : ""} you uploaded earlier will be attached.
-              </p>
-            )}
-            <FileDropzone compact onChange={setNewDocs} onBusyChange={setUploadsBusy} />
-          </div>
-        )}
       </div>
 
       {/* Honeypot */}
@@ -237,23 +206,6 @@ export function LeadForm({ defaultService, source, estimate, submitLabel = "Subm
         <input id="website" tabIndex={-1} autoComplete="off" {...register("website")} />
       </div>
 
-      <div className="mt-6">
-        <label className="flex items-start gap-3 text-sm text-muted">
-          <input type="checkbox" className="mt-0.5 size-[18px] shrink-0 rounded border-line-strong accent-brand-600" {...register("consent")} {...aria("consent")} />
-          <span>
-            I agree that Elite Tax Services may contact me by phone, email or text about my request. See our{" "}
-            <Link href="/privacy" className="font-medium text-brand-600 hover:underline">
-              Privacy Policy
-            </Link>
-            .
-          </span>
-        </label>
-        {errors.consent && (
-          <p id="consent-error" className="mt-1.5 flex items-center gap-1.5 text-[13px] text-danger-600">
-            <AlertCircle className="size-3.5" aria-hidden /> {errors.consent.message}
-          </p>
-        )}
-      </div>
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="flex items-center gap-2 text-xs text-muted">

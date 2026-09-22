@@ -10,6 +10,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
   const { q } = await searchParams;
   const repo = getRepository();
   const customers = await repo.listCustomers(q);
+  for (const c of customers) if (!c.clientId) c.clientId = await repo.assignClientId(c.id);
   const docs = await Promise.all(customers.map((c) => repo.listPortalDocuments(c.id)));
 
   return (
@@ -22,6 +23,9 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
               Leads
             </Link>
             <span className="font-display font-extrabold text-navy-900">Clients</span>
+            <Link href="/admin/inquiries" className="rounded-lg px-2.5 py-1 text-sm font-semibold text-muted hover:bg-canvas">
+              Inquiries
+            </Link>
           </div>
           <LogoutButton />
         </div>
@@ -45,6 +49,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="border-b border-line bg-canvas/60 text-xs uppercase tracking-wider text-muted">
                 <tr>
+                  <th className="px-4 py-3 font-semibold">Client ID</th>
                   <th className="px-4 py-3 font-semibold">Client</th>
                   <th className="px-4 py-3 font-semibold">Phone</th>
                   <th className="px-4 py-3 font-semibold">Uploads</th>
@@ -59,6 +64,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
                   const changes = d.some((x) => x.kind === "draft" && x.status === "changes_requested");
                   return (
                     <tr key={c.id} className="hover:bg-canvas/50">
+                      <td className="px-4 py-3 font-mono text-xs font-semibold text-navy-900">{c.clientId ?? "—"}</td>
                       <td className="px-4 py-3">
                         <Link href={`/admin/customers/${c.id}`} className="font-semibold text-navy-900 hover:text-brand-600">
                           {c.firstName} {c.lastName}

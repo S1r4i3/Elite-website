@@ -34,6 +34,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <Link href="/admin/customers" className="rounded-lg px-2.5 py-1 text-sm font-semibold text-brand-600 hover:bg-brand-50">
               Clients →
             </Link>
+            <Link href="/admin/inquiries" className="rounded-lg px-2.5 py-1 text-sm font-semibold text-brand-600 hover:bg-brand-50">
+              Inquiries →
+            </Link>
             <span className="rounded-full bg-canvas px-2 py-0.5 text-xs text-muted">{repo.driver === "postgres" ? "PostgreSQL" : "File store (dev)"}</span>
           </div>
           <LogoutButton />
