@@ -42,7 +42,7 @@ export function HeroVideo({ src = "/videos/hero" }: { src?: string }) {
   if (!enabled) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0" aria-hidden>
+    <div className="pointer-events-none absolute inset-x-0 -top-[12%] h-[124%]" data-parallax="0.3" suppressHydrationWarning aria-hidden>
       <video
         ref={ref}
         className={`absolute inset-0 size-full object-cover transition-opacity duration-1000 ${playing ? "opacity-100" : "opacity-0"}`}

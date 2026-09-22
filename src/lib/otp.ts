@@ -1,23 +1,27 @@
 import "server-only";
-import { createHash, randomInt, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import { getRepository, type OtpPurpose } from "@/lib/db";
 
 export const OTP_TTL_MS = 10 * 60 * 1000;
+export const LINK_TTL_MS = 24 * 60 * 60 * 1000; // email verification links last 24 hours
 export const OTP_RESEND_COOLDOWN_MS = 60 * 1000;
 export const OTP_MAX_ATTEMPTS = 5;
 
 const hash = (email: string, purpose: OtpPurpose, code: string) =>
   createHash("sha256").update(`${email}:${purpose}:${code}:${process.env.SESSION_SECRET || "elite-tax-dev-secret"}`).digest("hex");
 
-/** Creates and stores a new 6-digit code. Returns { code } or { retryAfter } if asked again too soon. */
-export async function issueOtp(email: string, purpose: OtpPurpose, payload: Record<string, unknown> | null = null) {
+/**
+ * Creates and stores a new secret for this email + purpose: a 6-digit code, or (with `link: true`) a long random
+ * token for a clickable verification link. Returns { code } or { retryAfter } if asked again too soon.
+ */
+export async function issueOtp(email: string, purpose: OtpPurpose, payload: Record<string, unknown> | null = null, opts: { link?: boolean } = {}) {
   const repo = getRepository();
   const existing = await repo.getOtp(email, purpose);
   if (existing) {
     const age = Date.now() - Date.parse(existing.createdAt);
     if (age < OTP_RESEND_COOLDOWN_MS) return { retryAfter: Math.ceil((OTP_RESEND_COOLDOWN_MS - age) / 1000) } as const;
   }
-  const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
+  const code = opts.link ? randomBytes(32).toString("base64url") : String(randomInt(0, 1_000_000)).padStart(6, "0");
   const now = Date.now();
   await repo.saveOtp({
     email,
@@ -26,7 +30,7 @@ export async function issueOtp(email: string, purpose: OtpPurpose, payload: Reco
     attempts: 0,
     payload,
     createdAt: new Date(now).toISOString(),
-    expiresAt: new Date(now + OTP_TTL_MS).toISOString(),
+    expiresAt: new Date(now + (opts.link ? LINK_TTL_MS : OTP_TTL_MS)).toISOString(),
   });
   return { code } as const;
 }

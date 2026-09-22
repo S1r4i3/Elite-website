@@ -1,3 +1,4 @@
+import { ParallaxDecor } from "@/components/effects/parallax-decor";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
@@ -59,7 +60,8 @@ function ConnectionGraphic() {
 
 export function UsIndia() {
   return (
-    <section className="section-y" aria-labelledby="usindia-heading">
+    <section className="section-y relative isolate overflow-hidden" aria-labelledby="usindia-heading">
+      <ParallaxDecor />
       <div className="container-x grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="order-2 lg:order-1 lg:col-span-6" data-reveal>
           <ConnectionGraphic />

@@ -1,10 +1,10 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, OtpPurpose, OtpRecord, Repository } from "./types";
+import type { Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, NewPortalDocument, OtpPurpose, OtpRecord, PortalDocKind, PortalDocument, Repository } from "./types";
 import { leadStatuses } from "./types";
 
-type DbShape = { leads: Lead[]; documents: DocumentRecord[]; customers?: Customer[]; otps?: OtpRecord[] };
+type DbShape = { leads: Lead[]; documents: DocumentRecord[]; customers?: Customer[]; otps?: OtpRecord[]; portalDocuments?: PortalDocument[] };
 
 const DATA_DIR = path.resolve(process.cwd(), ".data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
@@ -37,6 +37,9 @@ function mutate<T>(fn: (db: DbShape) => T | Promise<T>): Promise<T> {
   queue = run.catch(() => undefined);
   return run;
 }
+
+const normalizeCustomer = (c?: Customer): Customer | null =>
+  c ? Object.assign({ dob: null, state: null, country: null, address: null, passwordHash: null }, c) : null;
 
 /** Development / single-instance store. Use PostgreSQL in production. */
 export class FileRepository implements Repository {
@@ -105,12 +108,12 @@ export class FileRepository implements Repository {
 
   async findCustomerByEmail(email: string) {
     const db = await read();
-    return db.customers?.find((c) => c.email === email.toLowerCase()) ?? null;
+    return normalizeCustomer(db.customers?.find((c) => c.email === email.toLowerCase()));
   }
 
   async getCustomer(id: string) {
     const db = await read();
-    return db.customers?.find((c) => c.id === id) ?? null;
+    return normalizeCustomer(db.customers?.find((c) => c.id === id));
   }
 
   createCustomer(input: NewCustomer) {
@@ -119,7 +122,19 @@ export class FileRepository implements Repository {
       const email = input.email.toLowerCase();
       if (db.customers.some((c) => c.email === email)) throw new Error("EMAIL_EXISTS");
       const now = new Date().toISOString();
-      const customer: Customer = { ...input, email, id: randomUUID(), emailVerifiedAt: now, lastLoginAt: now, createdAt: now };
+      const customer: Customer = {
+        dob: null,
+        state: null,
+        country: null,
+        address: null,
+        passwordHash: null,
+        ...input,
+        email,
+        id: randomUUID(),
+        emailVerifiedAt: now,
+        lastLoginAt: now,
+        createdAt: now,
+      };
       db.customers.push(customer);
       return customer;
     });
@@ -129,6 +144,68 @@ export class FileRepository implements Repository {
     await mutate((db) => {
       const c = db.customers?.find((x) => x.id === id);
       if (c) c.lastLoginAt = new Date().toISOString();
+    });
+  }
+
+  updateCustomerProfile(id: string, patch: Partial<Pick<Customer, "firstName" | "lastName" | "phone" | "dob" | "state" | "country" | "address">>) {
+    return mutate((db) => {
+      const c = db.customers?.find((x) => x.id === id);
+      if (!c) return null;
+      Object.assign(c, patch);
+      return normalizeCustomer(c);
+    });
+  }
+
+  async setCustomerPassword(id: string, passwordHash: string) {
+    await mutate((db) => {
+      const c = db.customers?.find((x) => x.id === id);
+      if (c) c.passwordHash = passwordHash;
+    });
+  }
+
+  async listCustomers(search?: string) {
+    const db = await read();
+    let list = (db.customers ?? []).map((c) => normalizeCustomer(c)!);
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter((c) => `${c.firstName} ${c.lastName} ${c.email} ${c.phone ?? ""}`.toLowerCase().includes(q));
+    }
+    return list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  createPortalDocument(input: NewPortalDocument) {
+    return mutate((db) => {
+      const now = new Date().toISOString();
+      const doc: PortalDocument = { status: null, ...input, clientComment: null, createdAt: now, updatedAt: now };
+      (db.portalDocuments ??= []).push(doc);
+      return doc;
+    });
+  }
+
+  async listPortalDocuments(customerId: string, kind?: PortalDocKind) {
+    const db = await read();
+    return (db.portalDocuments ?? [])
+      .filter((d) => d.customerId === customerId && (!kind || d.kind === kind))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  async getPortalDocument(id: string) {
+    const db = await read();
+    return db.portalDocuments?.find((d) => d.id === id) ?? null;
+  }
+
+  updatePortalDocument(id: string, patch: Partial<Pick<PortalDocument, "status" | "clientComment" | "note">>) {
+    return mutate((db) => {
+      const d = db.portalDocuments?.find((x) => x.id === id);
+      if (!d) return null;
+      Object.assign(d, patch, { updatedAt: new Date().toISOString() });
+      return d;
+    });
+  }
+
+  async deletePortalDocument(id: string) {
+    await mutate((db) => {
+      db.portalDocuments = (db.portalDocuments ?? []).filter((d) => d.id !== id);
     });
   }
 

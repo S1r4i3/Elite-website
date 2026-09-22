@@ -1,3 +1,5 @@
+import { ParallaxDecor } from "@/components/effects/parallax-decor";
+import { ReviewsThreads } from "@/components/effects/reviews-threads";
 import Link from "next/link";
 import { BadgeCheck, ExternalLink, MessageSquareQuote, Star } from "lucide-react";
 import { SectionHeader } from "./section-header";
@@ -18,13 +20,16 @@ function Stars({ n }: { n: number }) {
 export function Reviews({ limit = 6, as = "h2" }: { limit?: number; as?: "h1" | "h2" }) {
   const list = reviews.slice(0, limit);
   return (
-    <section className="section-y bg-canvas" aria-labelledby="reviews-heading">
+    <section className="section-y relative isolate overflow-hidden bg-canvas" aria-labelledby="reviews-heading">
+      <ParallaxDecor flip />
       <div className="container-x">
         <SectionHeader as={as} eyebrow="Client reviews" title={<span id="reviews-heading">What Our Clients Say</span>} subtitle="Real feedback from real clients, linked to where it was posted." />
         {list.length > 0 ? (
-          <ul className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="relative isolate mt-12">
+          <ReviewsThreads />
+          <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {list.map((r) => (
-              <li key={r.name + r.text.slice(0, 12)} data-reveal className="card flex flex-col p-6 sm:p-7">
+              <li key={r.name + r.text.slice(0, 12)} data-reveal className="card flex flex-col bg-white/90 p-6 backdrop-blur-md sm:p-7">
                 <Stars n={r.rating} />
                 <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-ink">“{r.text}”</blockquote>
                 <div className="mt-6 flex items-center justify-between gap-3 border-t border-line pt-4">
@@ -44,8 +49,11 @@ export function Reviews({ limit = 6, as = "h2" }: { limit?: number; as?: "h1" | 
               </li>
             ))}
           </ul>
+          </div>
         ) : (
-          <div className="card mx-auto mt-12 max-w-2xl p-8 text-center sm:p-12">
+          <div className="relative isolate mt-12 py-6">
+          <ReviewsThreads />
+          <div data-tilt="4" suppressHydrationWarning className="card mx-auto max-w-2xl bg-white/85 p-8 text-center shadow-[var(--shadow-lift)] backdrop-blur-md sm:p-12">
             <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-brand-50 text-brand-600">
               <MessageSquareQuote className="size-7" strokeWidth={1.5} aria-hidden />
             </span>
@@ -67,10 +75,11 @@ export function Reviews({ limit = 6, as = "h2" }: { limit?: number; as?: "h1" | 
                   </a>
                 </Button>
               )}
-              <Button asChild>
+              <Button asChild className="btn-shine" data-magnetic>
                 <Link href="/contact">Become a client</Link>
               </Button>
             </div>
+          </div>
           </div>
         )}
       </div>

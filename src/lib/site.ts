@@ -20,7 +20,7 @@ export const site = {
     href: "tel:+13022022139",
     e164: "+13022022139",
   },
-  email: "info@elitebtax.com",
+  email: "support@elitebtax.com",
   address: {
     street: "8 The Green, Ste A",
     city: "Dover",

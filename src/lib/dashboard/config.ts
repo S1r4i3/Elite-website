@@ -1,16 +1,14 @@
-/**
- * Customer dashboard — future architecture.
- * Each section maps to a REST resource the backend will expose. UI is scaffolded with empty states
- * so features can be switched on as the APIs (see db/schema.sql) come online.
- */
+/** Client portal sections (sidebar order). */
 export const dashboardSections = [
-  { slug: "", label: "Dashboard", icon: "LayoutDashboard", api: "/api/me/summary", empty: "Your filing overview will appear here once your account is set up." },
-  { slug: "filing-status", label: "Tax Filing Status", icon: "ListChecks", api: "/api/me/filings", empty: "Track each return from intake to IRS acceptance." },
-  { slug: "documents", label: "Documents", icon: "FolderOpen", api: "/api/me/documents", empty: "Documents you upload and files we share with you will be listed here." },
-  { slug: "messages", label: "Messages", icon: "MessagesSquare", api: "/api/me/messages", empty: "Secure messages with your assigned tax professional." },
-  { slug: "payments", label: "Payments", icon: "CreditCard", api: "/api/me/payments", empty: "Invoices and payment history (payment gateway integration)." },
-  { slug: "tax-returns", label: "Tax Returns", icon: "FileArchive", api: "/api/me/returns", empty: "Download copies of your completed returns." },
-  { slug: "support", label: "Support", icon: "LifeBuoy", api: "/api/me/appointments", empty: "Book an appointment or contact support." },
+  { slug: "", label: "Dashboard", icon: "LayoutDashboard", description: "Your filing overview at a glance." },
+  { slug: "upload-documents", label: "Upload Documents", icon: "UploadCloud", description: "Send your tax documents securely to your tax professional." },
+  { slug: "my-documents", label: "My Documents", icon: "FolderOpen", description: "Everything you've uploaded, organized by type and tax year." },
+  { slug: "draft-estimation", label: "Draft Estimation", icon: "Calculator", description: "Review the draft tax estimate prepared for you, then approve it or ask for changes." },
+  { slug: "final-documents", label: "Final Documents", icon: "FileCheck2", description: "Your completed returns and final documents, ready to download." },
 ] as const;
+
+/** Account pages shown under the main sections. */
+export const accountSections = [{ slug: "profile", label: "Profile & Password", icon: "UserRound", description: "Keep your details up to date and change your password." }] as const;
+export const allDashboardSections = [...dashboardSections, ...accountSections];
 
 export type DashboardSection = (typeof dashboardSections)[number];

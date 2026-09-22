@@ -28,8 +28,10 @@ function safeEqual(a: string, b: string) {
   return diff === 0;
 }
 
-export async function createSessionToken(customerId: string) {
-  const payload = `${customerId}.${Date.now() + SESSION_MAX_AGE * 1000}`;
+export const SHORT_SESSION_MAX_AGE = 60 * 60 * 24; // 1 day when "Remember me" is off
+
+export async function createSessionToken(customerId: string, maxAgeSeconds = SESSION_MAX_AGE) {
+  const payload = `${customerId}.${Date.now() + maxAgeSeconds * 1000}`;
   return `${payload}.${await hmac(`customer:${payload}`)}`;
 }
 

@@ -21,7 +21,7 @@ export function HeroQuickStart() {
         <BadgeCheck className="size-3.5" aria-hidden /> IRS authorized e-file provider
       </div>
 
-      <div className="gradient-border relative rounded-3xl border border-white/15 bg-white/[0.07] p-5 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-7">
+      <div data-tilt="5" suppressHydrationWarning className="gradient-border relative rounded-3xl border border-white/15 bg-white/[0.07] p-5 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-7">
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl" aria-hidden><div className="absolute -right-20 -top-24 size-64 animate-pulse rounded-full bg-brand-600/25 blur-3xl" /></div>
 
         <div className="relative">

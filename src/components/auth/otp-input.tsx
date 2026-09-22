@@ -27,7 +27,7 @@ export function OtpInput({
     next[i] = d;
     const joined = next.join("").slice(0, 6);
     onChange(joined);
-    if (joined.length === 6 && !joined.includes("")) onComplete?.(joined);
+    if (/^\d{6}$/.test(joined)) onComplete?.(joined);
   };
 
   const fill = (text: string, from = 0) => {

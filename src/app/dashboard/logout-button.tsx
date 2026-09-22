@@ -20,7 +20,7 @@ export function LogoutButton({ className }: { className?: string }) {
       }}
       className={cn("inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-muted transition hover:bg-danger-50 hover:text-danger-600", className)}
     >
-      {busy ? <Loader2 className="size-[18px] animate-spin" aria-hidden /> : <LogOut className="size-[18px]" aria-hidden />} Log out
+      {busy ? <Loader2 className="size-[18px] animate-spin" aria-hidden /> : <LogOut className="size-[18px]" aria-hidden />} Sign out
     </button>
   );
 }

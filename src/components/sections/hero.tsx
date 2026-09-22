@@ -12,10 +12,12 @@ export function Hero() {
     <section className="slate-bg relative overflow-hidden text-white">
       <HeroVideo />
       <div className="grid-bg-dark pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_70%_60%_at_70%_20%,black,transparent)]" aria-hidden />
-      <div className="pointer-events-none absolute -right-40 -top-40 size-[560px] rounded-full bg-brand-600/20 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -right-40 -top-40" data-parallax="-0.2" suppressHydrationWarning aria-hidden>
+        <div data-depth="40" suppressHydrationWarning className="size-[560px] rounded-full bg-brand-600/20 blur-3xl" />
+      </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand-600/60 to-transparent" aria-hidden />
       <div className="container-x relative grid items-center gap-14 pb-16 pt-10 sm:pt-14 lg:grid-cols-12 lg:gap-10 lg:pb-24 lg:pt-20">
-        <div className="lg:col-span-6">
+        <div className="lg:col-span-6" data-parallax="-0.08" suppressHydrationWarning>
           <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[13px] font-medium text-white/80 backdrop-blur">
             <span className="size-2 rounded-full bg-brand-500 shadow-[0_0_0_3px_rgb(227_25_47/0.25)]" aria-hidden />
             Individual, business & U.S. + India tax services
@@ -28,12 +30,12 @@ export function Hero() {
             Professional tax preparation and business tax services designed to make filing simpler, clearer, and more convenient.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg" className="btn-shine btn-glow">
+            <Button asChild size="lg" className="btn-shine btn-glow" data-magnetic>
               <Link href="/get-started">
                 Get Started Today <ArrowRight aria-hidden />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outlineLight" className="phone-ring">
+            <Button asChild size="lg" variant="outlineLight" className="phone-ring" data-magnetic>
               <Link href="/contact"><Phone aria-hidden /> Talk to a Tax Professional</Link>
             </Button>
           </div>
@@ -50,7 +52,7 @@ export function Hero() {
             <Phone className="size-4" aria-hidden /> {site.phone.display}
           </a>
         </div>
-        <div className="lg:col-span-6">
+        <div className="lg:col-span-6" data-depth="-14" suppressHydrationWarning>
           <HeroQuickStart />
         </div>
       </div>

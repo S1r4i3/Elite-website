@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Menu, Phone, X, ArrowRight, UserRound, LogIn } from "lucide-react";
+import { ChevronDown, Menu, Phone, X, ArrowRight, UserRound, LogIn, LogOut } from "lucide-react";
+import { AccountMenu, type Account } from "./account-menu";
 import { Logo } from "./logo";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -18,7 +19,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileGroup, setMobileGroup] = useState<number | null>(null);
   const navRef = useRef<HTMLElement>(null);
-  const [account, setAccount] = useState<{ firstName: string } | null>(null);
+  const [account, setAccount] = useState<Account>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -148,15 +149,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href={account ? "/dashboard" : "/login"}
-            className="group hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-2.5 py-2 text-sm font-semibold text-navy-900 transition hover:bg-canvas hover:text-brand-600 sm:inline-flex"
-          >
-            <span className="grid size-8 place-items-center rounded-full border border-line-strong bg-white text-navy-900 transition group-hover:border-brand-300 group-hover:text-brand-600">
-              <UserRound className="size-4" aria-hidden />
-            </span>
-            <span className="xl:sr-only 2xl:not-sr-only">{account ? `Hi, ${account.firstName}` : "Log in"}</span>
-          </Link>
+          <AccountMenu account={account} onSignedOut={() => setAccount(null)} />
           <Button asChild size="md" className="hidden sm:inline-flex">
             <Link href={primaryCta.href}>{primaryCta.label}</Link>
           </Button>
@@ -228,11 +221,35 @@ export function Header() {
           </ul>
         </nav>
         <div className="grid gap-3 border-t border-line p-4 sm:px-6">
-          <Button asChild variant="secondary" size="lg" className="w-full">
-            <Link href={account ? "/dashboard" : "/login"} tabIndex={mobileOpen ? 0 : -1}>
-              {account ? <UserRound aria-hidden /> : <LogIn aria-hidden />} {account ? "My account" : "Log in / Register"}
-            </Link>
-          </Button>
+          {account ? (
+            <div className="grid grid-cols-2 gap-3">
+              <Button asChild variant="secondary" size="lg" className="w-full">
+                <Link href="/dashboard" tabIndex={mobileOpen ? 0 : -1}>
+                  <UserRound aria-hidden /> My account
+                </Link>
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full text-danger-600"
+                tabIndex={mobileOpen ? 0 : -1}
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+                  setAccount(null);
+                  setMobileOpen(false);
+                  window.location.href = "/";
+                }}
+              >
+                <LogOut aria-hidden /> Sign out
+              </Button>
+            </div>
+          ) : (
+            <Button asChild variant="secondary" size="lg" className="w-full border-2 border-brand-600 text-brand-600">
+              <Link href="/login" tabIndex={mobileOpen ? 0 : -1}>
+                <LogIn aria-hidden /> Login / Register
+              </Link>
+            </Button>
+          )}
           <Button asChild size="lg" className="w-full">
             <Link href={primaryCta.href} tabIndex={mobileOpen ? 0 : -1}>{primaryCta.label}</Link>
           </Button>

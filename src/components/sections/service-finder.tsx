@@ -1,5 +1,7 @@
 "use client";
 
+import { ParallaxDecor } from "@/components/effects/parallax-decor";
+
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -197,7 +199,8 @@ export function ServiceFinder() {
   const step = !selected ? 1 : rec ? 3 : 2;
 
   return (
-    <section id="service-finder" className="section-y bg-canvas" aria-labelledby="finder-heading">
+    <section id="service-finder" className="section-y relative isolate overflow-hidden bg-canvas" aria-labelledby="finder-heading">
+      <ParallaxDecor />
       <div className="container-x">
         <SectionHeader
           eyebrow="Service finder"

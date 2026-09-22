@@ -20,15 +20,22 @@ type Props = {
   onBusyChange?: (busy: boolean) => void;
   compact?: boolean;
   label?: string;
+  /** Upload endpoint (default: public lead uploads). */
+  endpoint?: string;
+  /** Extra form fields sent with every file (e.g. taxYear). */
+  extraFields?: Record<string, string>;
+  /** Called after each successful upload. */
+  onUploaded?: (id: string) => void;
 };
 
-function uploadFile(file: File, category: string, onProgress: (p: number) => void) {
+function uploadFile(file: File, category: string, onProgress: (p: number) => void, endpoint = "/api/uploads", extra: Record<string, string> = {}) {
   return new Promise<{ id: string }>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const body = new FormData();
     body.append("file", file);
     body.append("category", category);
-    xhr.open("POST", "/api/uploads");
+    for (const [k, v] of Object.entries(extra)) body.append(k, v);
+    xhr.open("POST", endpoint);
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100));
     xhr.onload = () => {
       try {
@@ -44,7 +51,7 @@ function uploadFile(file: File, category: string, onProgress: (p: number) => voi
   });
 }
 
-export function FileDropzone({ category = "other", onChange, onBusyChange, compact = false, label = "Upload documents" }: Props) {
+export function FileDropzone({ category = "other", onChange, onBusyChange, compact = false, label = "Upload documents", endpoint, extraFields, onUploaded }: Props) {
   const [items, setItems] = useState<UploadItem[]>([]);
   const [dragging, setDragging] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -63,11 +70,15 @@ export function FileDropzone({ category = "other", onChange, onBusyChange, compa
 
   const start = useCallback(
     (item: UploadItem) => {
-      uploadFile(item.file, category, (p) => update(item.key, { progress: p }))
-        .then(({ id }) => update(item.key, { status: "done", progress: 100, id }))
+      uploadFile(item.file, category, (p) => update(item.key, { progress: p }), endpoint, extraFields)
+        .then(({ id }) => {
+          update(item.key, { status: "done", progress: 100, id });
+          onUploaded?.(id);
+        })
         .catch((e: Error) => update(item.key, { status: "error", error: e.message }));
     },
-    [category],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [category, endpoint, JSON.stringify(extraFields)],
   );
 
   const addFiles = (list: FileList | File[]) => {

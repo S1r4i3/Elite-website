@@ -15,6 +15,12 @@ export async function saveObject(key: string, data: Buffer) {
   return key;
 }
 
+export async function deleteObject(key: string) {
+  const file = path.join(root(), key);
+  if (!file.startsWith(root())) throw new Error("Invalid key");
+  await fs.rm(file, { force: true });
+}
+
 export async function readObject(key: string) {
   const file = path.join(root(), key);
   if (!file.startsWith(root())) throw new Error("Invalid key");

@@ -25,11 +25,16 @@ CREATE TABLE IF NOT EXISTS customers (
 -- Customer accounts (email OTP sign-in)
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS email_verified_at timestamptz;
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS last_login_at timestamptz;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS dob date;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS state text;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS country text;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS address text;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_hash text;
 CREATE UNIQUE INDEX IF NOT EXISTS customers_email_lower_idx ON customers (lower(email));
 
 CREATE TABLE IF NOT EXISTS auth_otps (
   email         text NOT NULL,
-  purpose       text NOT NULL CHECK (purpose IN ('login','register')),
+  purpose       text NOT NULL,
   code_hash     text NOT NULL,
   attempts      int NOT NULL DEFAULT 0,
   payload       jsonb,
@@ -37,6 +42,27 @@ CREATE TABLE IF NOT EXISTS auth_otps (
   created_at    timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (email, purpose)
 );
+ALTER TABLE auth_otps DROP CONSTRAINT IF EXISTS auth_otps_purpose_check;
+ALTER TABLE auth_otps ADD CONSTRAINT auth_otps_purpose_check CHECK (purpose IN ('login','register','reset'));
+
+-- Client portal files: client uploads, draft estimates and final documents
+CREATE TABLE IF NOT EXISTS portal_documents (
+  id             uuid PRIMARY KEY,
+  customer_id    uuid NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  kind           text NOT NULL CHECK (kind IN ('upload','draft','final')),
+  original_name  text NOT NULL,
+  mime_type      text NOT NULL,
+  size_bytes     bigint NOT NULL,
+  category       text,
+  tax_year       text,
+  storage_key    text NOT NULL,
+  note           text,
+  status         text CHECK (status IN ('awaiting_review','approved','changes_requested')),
+  client_comment text,
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  updated_at     timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS portal_documents_customer_idx ON portal_documents (customer_id, kind, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS leads (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),

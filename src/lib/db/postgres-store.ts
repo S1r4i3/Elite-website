@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import type { Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, OtpPurpose, OtpRecord, Repository } from "./types";
+import type { Customer, DocumentRecord, Lead, LeadStatus, ListLeadsOptions, NewCustomer, NewDocument, NewLead, NewPortalDocument, OtpPurpose, OtpRecord, PortalDocKind, PortalDocument, Repository } from "./types";
 import { leadStatuses } from "./types";
 
 const globalForPg = globalThis as unknown as { __elitePgPool?: Pool };
@@ -51,6 +51,11 @@ const toCustomer = (r: any): Customer => ({
   lastName: r.last_name,
   email: r.email,
   phone: r.phone,
+  dob: r.dob ? new Date(r.dob).toISOString().slice(0, 10) : null,
+  state: r.state,
+  country: r.country,
+  address: r.address,
+  passwordHash: r.password_hash,
   emailVerifiedAt: r.email_verified_at ? new Date(r.email_verified_at).toISOString() : null,
   lastLoginAt: r.last_login_at ? new Date(r.last_login_at).toISOString() : null,
   createdAt: new Date(r.created_at).toISOString(),
@@ -64,6 +69,23 @@ const toOtp = (r: any): OtpRecord => ({
   payload: r.payload,
   expiresAt: new Date(r.expires_at).toISOString(),
   createdAt: new Date(r.created_at).toISOString(),
+});
+
+const toPortalDoc = (r: any): PortalDocument => ({
+  id: r.id,
+  customerId: r.customer_id,
+  kind: r.kind,
+  originalName: r.original_name,
+  mimeType: r.mime_type,
+  size: Number(r.size_bytes),
+  category: r.category,
+  taxYear: r.tax_year,
+  storageKey: r.storage_key,
+  note: r.note,
+  status: r.status,
+  clientComment: r.client_comment,
+  createdAt: new Date(r.created_at).toISOString(),
+  updatedAt: new Date(r.updated_at).toISOString(),
 });
 
 export class PostgresRepository implements Repository {
@@ -169,9 +191,9 @@ export class PostgresRepository implements Repository {
   async createCustomer(c: NewCustomer) {
     try {
       const { rows } = await pool().query(
-        `INSERT INTO customers (first_name, last_name, email, phone, email_verified_at, last_login_at)
-         VALUES ($1,$2,lower($3),$4,now(),now()) RETURNING *`,
-        [c.firstName, c.lastName, c.email, c.phone],
+        `INSERT INTO customers (first_name, last_name, email, phone, dob, state, country, address, password_hash, email_verified_at, last_login_at)
+         VALUES ($1,$2,lower($3),$4,$5,$6,$7,$8,$9,now(),now()) RETURNING *`,
+        [c.firstName, c.lastName, c.email, c.phone, c.dob ?? null, c.state ?? null, c.country ?? null, c.address ?? null, c.passwordHash ?? null],
       );
       return toCustomer(rows[0]);
     } catch (e) {
@@ -182,6 +204,69 @@ export class PostgresRepository implements Repository {
 
   async touchCustomerLogin(id: string) {
     await pool().query(`UPDATE customers SET last_login_at = now() WHERE id = $1`, [id]);
+  }
+
+  async updateCustomerProfile(id: string, p: Partial<Pick<Customer, "firstName" | "lastName" | "phone" | "dob" | "state" | "country" | "address">>) {
+    const { rows } = await pool().query(
+      `UPDATE customers SET first_name = coalesce($2, first_name), last_name = coalesce($3, last_name), phone = coalesce($4, phone),
+         dob = coalesce($5::date, dob), state = coalesce($6, state), country = coalesce($7, country), address = coalesce($8, address)
+       WHERE id = $1 RETURNING *`,
+      [id, p.firstName ?? null, p.lastName ?? null, p.phone ?? null, p.dob ?? null, p.state ?? null, p.country ?? null, p.address ?? null],
+    );
+    return rows[0] ? toCustomer(rows[0]) : null;
+  }
+
+  async setCustomerPassword(id: string, passwordHash: string) {
+    await pool().query(`UPDATE customers SET password_hash = $2 WHERE id = $1`, [id, passwordHash]);
+  }
+
+  async listCustomers(search?: string) {
+    const params: unknown[] = [];
+    let where = "";
+    if (search) {
+      params.push(`%${search}%`);
+      where = `WHERE (first_name || ' ' || last_name || ' ' || email || ' ' || coalesce(phone,'')) ILIKE $1`;
+    }
+    const { rows } = await pool().query(`SELECT * FROM customers ${where} ORDER BY created_at DESC LIMIT 500`, params);
+    return rows.map(toCustomer);
+  }
+
+  async createPortalDocument(d: NewPortalDocument) {
+    const { rows } = await pool().query(
+      `INSERT INTO portal_documents (id, customer_id, kind, original_name, mime_type, size_bytes, category, tax_year, storage_key, note, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+      [d.id, d.customerId, d.kind, d.originalName, d.mimeType, d.size, d.category, d.taxYear, d.storageKey, d.note, d.status ?? null],
+    );
+    return toPortalDoc(rows[0]);
+  }
+
+  async listPortalDocuments(customerId: string, kind?: PortalDocKind) {
+    const { rows } = kind
+      ? await pool().query(`SELECT * FROM portal_documents WHERE customer_id = $1 AND kind = $2 ORDER BY created_at DESC`, [customerId, kind])
+      : await pool().query(`SELECT * FROM portal_documents WHERE customer_id = $1 ORDER BY created_at DESC`, [customerId]);
+    return rows.map(toPortalDoc);
+  }
+
+  async getPortalDocument(id: string) {
+    const { rows } = await pool().query(`SELECT * FROM portal_documents WHERE id = $1`, [id]);
+    return rows[0] ? toPortalDoc(rows[0]) : null;
+  }
+
+  async updatePortalDocument(id: string, patch: Partial<Pick<PortalDocument, "status" | "clientComment" | "note">>) {
+    const { rows } = await pool().query(
+      `UPDATE portal_documents SET
+         status = CASE WHEN $2::boolean THEN $3 ELSE status END,
+         client_comment = CASE WHEN $4::boolean THEN $5 ELSE client_comment END,
+         note = CASE WHEN $6::boolean THEN $7 ELSE note END,
+         updated_at = now()
+       WHERE id = $1 RETURNING *`,
+      [id, "status" in patch, patch.status ?? null, "clientComment" in patch, patch.clientComment ?? null, "note" in patch, patch.note ?? null],
+    );
+    return rows[0] ? toPortalDoc(rows[0]) : null;
+  }
+
+  async deletePortalDocument(id: string) {
+    await pool().query(`DELETE FROM portal_documents WHERE id = $1`, [id]);
   }
 
   async saveOtp(o: OtpRecord) {

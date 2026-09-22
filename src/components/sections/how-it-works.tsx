@@ -1,3 +1,4 @@
+import { ParallaxDecor } from "@/components/effects/parallax-decor";
 import { ClipboardList, FolderUp, UserRoundCheck, Send } from "lucide-react";
 import { SectionHeader } from "./section-header";
 
@@ -10,7 +11,8 @@ export const processSteps = [
 
 export function HowItWorks({ title = "How It Works", subtitle = "A simple, guided process from first conversation to filed return.", as = "h2" }: { title?: string; subtitle?: string; as?: "h1" | "h2" }) {
   return (
-    <section className="section-y" aria-labelledby="how-heading">
+    <section className="section-y relative isolate overflow-hidden" aria-labelledby="how-heading">
+      <ParallaxDecor flip />
       <div className="container-x">
         <SectionHeader as={as} eyebrow="Simple process" title={<span id="how-heading">{title}</span>} subtitle={subtitle} />
         <ol className="relative mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">

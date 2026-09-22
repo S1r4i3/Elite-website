@@ -1,3 +1,4 @@
+import { ParallaxDecor } from "@/components/effects/parallax-decor";
 import Link from "next/link";
 import { ArrowRight, Building2, Briefcase, BookOpen, Wallet, LineChart, Network, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,8 @@ function BusinessVisual() {
 
 export function BusinessServices() {
   return (
-    <section className="slate-bg relative overflow-hidden py-16 sm:py-20 lg:py-24" aria-labelledby="business-heading">
+    <section className="slate-bg relative isolate overflow-hidden py-16 sm:py-20 lg:py-24" aria-labelledby="business-heading">
+      <ParallaxDecor variant="dark" flip />
       <div className="grid-bg-dark pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_right,black,transparent_70%)]" aria-hidden />
       <div className="container-x relative grid items-center gap-14 lg:grid-cols-12">
         <div className="lg:col-span-5">

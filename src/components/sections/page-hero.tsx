@@ -1,3 +1,4 @@
+import { ParallaxDecor } from "@/components/effects/parallax-decor";
 import Link from "next/link";
 import { ArrowRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,8 @@ export function PageHero({
   showCallLine?: boolean;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-line bg-canvas">
+    <section className="relative isolate overflow-hidden border-b border-line bg-canvas">
+      <ParallaxDecor flip />
       <div className="grid-bg pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" aria-hidden />
       <div className="container-x relative py-12 sm:py-16 lg:py-20">
         <Breadcrumbs items={crumbs} />
