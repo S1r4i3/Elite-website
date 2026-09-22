@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionHeader } from "./section-header";
-import { cn } from "@/lib/utils";
 
 type Rec = { title: string; body: string; services: { label: string; href: string }[]; cta: { label: string; href: string } };
 type Option = {
@@ -209,12 +208,6 @@ export function ServiceFinder() {
         />
 
         <div className="mx-auto mt-10 max-w-5xl">
-          {/* Progress */}
-          <div className="mb-6 flex items-center justify-center gap-2" aria-hidden>
-            {[1, 2, 3].map((n) => (
-              <span key={n} className={cn("h-1.5 rounded-full transition-all duration-300", n <= step ? "w-10 bg-brand-600" : "w-6 bg-line-strong")} />
-            ))}
-          </div>
           <p className="sr-only" aria-live="polite">
             Step {step} of 3
           </p>

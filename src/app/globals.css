@@ -279,6 +279,11 @@ html.custom-cursor-on [contenteditable="true"] { cursor: auto !important; }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
+/* WhatsApp floating button: slowly rotating "24/7 SUPPORT" caption */
+.wa-spin { animation: wa-spin 14s linear infinite; transform-origin: 50% 50%; }
+@keyframes wa-spin { to { transform: rotate(360deg); } }
+.wa-float:hover .wa-spin { animation-duration: 6s; }
+
 /* Wrong-code shake */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }

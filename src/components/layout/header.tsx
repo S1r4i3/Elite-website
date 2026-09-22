@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Menu, Phone, X, ArrowRight, UserRound, LogIn, LogOut } from "lucide-react";
+import { ChevronDown, ExternalLink, Menu, Phone, X, ArrowRight, UserRound, LogIn, LogOut } from "lucide-react";
 import { AccountMenu, type Account } from "./account-menu";
 import { Logo } from "./logo";
 import { Button } from "@/components/ui/button";
@@ -132,6 +132,18 @@ export function Header() {
                     </div>
                   </>
                 ) : (
+                  item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-2 text-[14px] font-medium text-muted transition-colors hover:text-brand-600"
+                    >
+                      {item.label}
+                      <ExternalLink className="size-3.5" aria-hidden />
+                      <span className="sr-only">(opens the IRS website in a new tab)</span>
+                    </a>
+                  ) : (
                   <Link
                     href={item.href}
                     aria-current={isActive(item.href) ? "page" : undefined}
@@ -142,6 +154,7 @@ export function Header() {
                   >
                     {item.label}
                   </Link>
+                  )
                 )}
               </li>
             ))}
@@ -212,9 +225,23 @@ export function Header() {
                     )}
                   </>
                 ) : (
+                  item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      tabIndex={mobileOpen ? 0 : -1}
+                      className="flex items-center gap-2 py-4 text-[17px] font-semibold text-navy-900"
+                    >
+                      {item.label}
+                      <ExternalLink className="size-4 text-brand-600" aria-hidden />
+                      <span className="sr-only">(opens the IRS website in a new tab)</span>
+                    </a>
+                  ) : (
                   <Link href={item.href} tabIndex={mobileOpen ? 0 : -1} className="block py-4 text-[17px] font-semibold text-navy-900">
                     {item.label}
                   </Link>
+                  )
                 )}
               </li>
             ))}

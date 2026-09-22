@@ -8,20 +8,19 @@ const list = [
   { icon: Building2, label: "LLC Formation", href: "/llc-services" },
   { icon: Briefcase, label: "Corporate Tax Filing", href: "/corporate-tax" },
   { icon: BookOpen, label: "Bookkeeping", href: "/bookkeeping" },
-  { icon: Wallet, label: "Payroll", href: "/payroll" },
   { icon: LineChart, label: "Business Tax Planning", href: "/business-services#planning" },
   { icon: Network, label: "Entity Formation", href: "/entity-formation" },
 ];
 
 function BusinessVisual() {
-  const bars = [42, 55, 48, 66, 58, 74, 70, 82, 76, 90, 84, 96];
+  const bars = [10, 15,20, 25, 30, 40, 50, 60,65, 70,78, 96];
   return (
-    <div className="relative" role="img" aria-label="Illustration of a business finance dashboard with revenue chart, filing calendar and payroll status">
+    <div className="relative" role="img" aria-label="Illustration of a business finance dashboard with revenue chart, filing calendar">
       <div className="rounded-[22px] border border-white/10 bg-navy-800/60 p-5 backdrop-blur sm:p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-white/50">Business overview</p>
-            <p className="font-display text-lg font-bold text-white">Acme Studio LLC</p>
+            <p className="font-display text-lg font-bold text-white">EliteBTax Services</p>
           </div>
           <span className="rounded-full bg-success-600/15 px-2.5 py-1 text-xs font-semibold text-green-300">Books reconciled</span>
         </div>
@@ -40,7 +39,7 @@ function BusinessVisual() {
         <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4">
           <div className="flex items-center justify-between text-[11px] text-white/50">
             <span>Monthly revenue</span>
-            <span>Jan – Dec</span>
+            <span>Jan – Apr</span>
           </div>
           <div className="mt-3 flex h-28 items-end gap-1.5">
             {bars.map((h, i) => (
@@ -57,7 +56,7 @@ function BusinessVisual() {
             </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-            <p className="text-[11px] text-white/50">Payroll</p>
+            <p className="text-[11px] text-white/50">filing status</p>
             <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-white">
               <Check className="size-4 text-green-300" /> Q3 941 filed
             </p>
@@ -65,7 +64,6 @@ function BusinessVisual() {
           </div>
         </div>
       </div>
-      <p className="mt-3 text-center text-[11px] text-white/40">Illustrative example</p>
     </div>
   );
 }
@@ -80,8 +78,7 @@ export function BusinessServices() {
           <SectionHeader
             dark
             align="left"
-            eyebrow="Business services"
-            title={<span id="business-heading">Tax & Individual Business Tax Services</span>}
+            title={<span id="business-heading">Individual Business Tax Services</span>}
             subtitle="From forming your company to payroll and year-end returns — one team that understands both your books and your taxes."
           />
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">

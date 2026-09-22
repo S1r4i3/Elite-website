@@ -16,7 +16,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           <AlertTriangle className="size-7" aria-hidden />
         </span>
         <h1 className="mt-5 text-3xl font-extrabold">Something went wrong.</h1>
-        <p className="mx-auto mt-3 max-w-md text-muted">Please try again. If the problem continues, call us at +1 (302) 202-2139.</p>
+        <p className="mx-auto mt-3 max-w-md text-muted">Please try again. If the problem continues, call us at +1 (945) 388-4422.</p>
         <div className="mt-8 flex justify-center gap-3">
           <Button onClick={reset}>Try again</Button>
           <Button asChild variant="secondary">

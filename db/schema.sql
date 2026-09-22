@@ -39,10 +39,13 @@ CREATE TABLE IF NOT EXISTS inquiries (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name       text NOT NULL,
   phone      text NOT NULL,
+  email      text,
   message    text,
   page       text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS email text;
 
 CREATE TABLE IF NOT EXISTS auth_otps (
   email         text NOT NULL,

@@ -23,3 +23,4 @@ export async function isValidAdminToken(token: string | undefined) {
   for (let i = 0; i < token.length; i++) diff |= token.charCodeAt(i) ^ expected.charCodeAt(i);
   return diff === 0;
 }
+

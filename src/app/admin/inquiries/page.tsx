@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageCircle, Phone } from "lucide-react";
+import { Mail, MessageCircle, Phone } from "lucide-react";
 import { getRepository } from "@/lib/db";
 import { LogoMark } from "@/components/layout/logo";
 import { LogoutButton } from "../admin-controls";
@@ -34,11 +34,12 @@ export default async function AdminInquiriesPage() {
           </div>
         ) : (
           <div className="card mt-6 overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
+            <table className="w-full min-w-[780px] text-left text-sm">
               <thead className="border-b border-line bg-canvas/60 text-xs uppercase tracking-wider text-muted">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Name</th>
                   <th className="px-4 py-3 font-semibold">Mobile</th>
+                  <th className="px-4 py-3 font-semibold">Email</th>
                   <th className="px-4 py-3 font-semibold">Message</th>
                   <th className="px-4 py-3 font-semibold">Received</th>
                 </tr>
@@ -51,6 +52,15 @@ export default async function AdminInquiriesPage() {
                       <a href={`tel:${i.phone.replace(/[^\d+]/g, "")}`} className="inline-flex items-center gap-1.5 text-brand-600 hover:underline">
                         <Phone className="size-3.5" aria-hidden /> {i.phone}
                       </a>
+                    </td>
+                    <td className="px-4 py-3">
+                      {i.email ? (
+                        <a href={`mailto:${i.email}`} className="inline-flex items-center gap-1.5 text-brand-600 hover:underline">
+                          <Mail className="size-3.5" aria-hidden /> {i.email}
+                        </a>
+                      ) : (
+                        <span className="text-subtle">—</span>
+                      )}
                     </td>
                     <td className="max-w-md px-4 py-3 text-ink">{i.message || <span className="text-subtle">—</span>}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-muted">

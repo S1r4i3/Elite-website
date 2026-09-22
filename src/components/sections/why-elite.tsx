@@ -27,13 +27,7 @@ export function WhyElite() {
             </div>
           ))}
         </div>
-        <ul className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] text-muted">
-          {site.credentials.map((c) => (
-            <li key={c} className="flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-brand-600" aria-hidden /> {c}
-            </li>
-          ))}
-        </ul>
+       
       </div>
     </section>
   );

@@ -97,7 +97,7 @@ export type NewPortalDocument = Omit<PortalDocument, "createdAt" | "updatedAt" |
   Partial<Pick<PortalDocument, "status">>;
 
 /** Visitor inquiry from the website pop-up form. */
-export type Inquiry = { id: string; name: string; phone: string; message: string | null; page: string | null; createdAt: string };
+export type Inquiry = { id: string; name: string; phone: string; email: string | null; message: string | null; page: string | null; createdAt: string };
 export type NewInquiry = Omit<Inquiry, "id" | "createdAt">;
 
 /** Persistence contract. Swap implementations without touching routes or UI. */

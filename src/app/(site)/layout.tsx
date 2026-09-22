@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { MobileCta } from "@/components/layout/mobile-cta";
+import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { Suspense } from "react";
 import { VerifiedToast } from "@/components/auth/verified-toast";
 import { MotionEffects } from "@/components/effects/motion-effects";
@@ -17,6 +18,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <main id="main">{children}</main>
       <Footer />
       <MobileCta />
+      <WhatsAppButton />
       <MotionEffects />
       <CustomCursor />
       <InquiryPopup />

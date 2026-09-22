@@ -52,7 +52,7 @@ export function ServicesGrid() {
               href={s.href}
               data-reveal
               data-cursor="View"
-              style={{ transitionDelay: `${i * 60}ms` }}
+              style={{ transitionDelay: `${i * 50}ms` }}
               className="group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-white/[0.05] p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-brand-300/60 hover:bg-white/[0.09] hover:shadow-[0_20px_50px_-12px_rgb(200_16_46/0.45)] sm:p-7"
             >
               {/* hover glow */}

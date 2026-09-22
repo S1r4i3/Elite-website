@@ -1,4 +1,4 @@
-export type NavLink = { label: string; href: string; description?: string; icon?: string };
+export type NavLink = { label: string; href: string; description?: string; icon?: string; external?: boolean };
 export type NavItem = NavLink & { children?: NavLink[] };
 
 export const taxServiceLinks: NavLink[] = [
@@ -24,7 +24,7 @@ export const mainNav: NavItem[] = [
   { label: "Tax Services", href: "/tax-services", children: taxServiceLinks },
   { label: "Business Services", href: "/business-services", children: businessServiceLinks },
   { label: "Indian Tax Services", href: "/indian-tax-services" },
-  { label: "How It Works", href: "/how-it-works" },
+  { label: "Refund Status", href: "https://sa.www4.irs.gov/wmr/", external: true },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

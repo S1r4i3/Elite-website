@@ -222,16 +222,16 @@ export class PostgresRepository implements Repository {
 
   async createInquiry(i: NewInquiry) {
     const { rows } = await pool().query(
-      `INSERT INTO inquiries (name, phone, message, page) VALUES ($1,$2,$3,$4) RETURNING *`,
-      [i.name, i.phone, i.message, i.page],
+      `INSERT INTO inquiries (name, phone, email, message, page) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
+      [i.name, i.phone, i.email, i.message, i.page],
     );
     const r = rows[0];
-    return { id: r.id, name: r.name, phone: r.phone, message: r.message, page: r.page, createdAt: new Date(r.created_at).toISOString() };
+    return { id: r.id, name: r.name, phone: r.phone, email: r.email ?? null, message: r.message, page: r.page, createdAt: new Date(r.created_at).toISOString() };
   }
 
   async listInquiries(limit = 200) {
     const { rows } = await pool().query(`SELECT * FROM inquiries ORDER BY created_at DESC LIMIT ${Number(limit)}`);
-    return rows.map((r) => ({ id: r.id, name: r.name, phone: r.phone, message: r.message, page: r.page, createdAt: new Date(r.created_at).toISOString() }));
+    return rows.map((r) => ({ id: r.id, name: r.name, phone: r.phone, email: r.email ?? null, message: r.message, page: r.page, createdAt: new Date(r.created_at).toISOString() }));
   }
 
   async createCustomer(c: NewCustomer) {

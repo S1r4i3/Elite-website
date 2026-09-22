@@ -2,37 +2,48 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { CheckCircle2, Loader2, MessageCircle, Phone, Send, X } from "lucide-react";
+import { CheckCircle2, Loader2, Mail, MessageCircle, Phone, Send, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { site } from "@/lib/site";
 
-const KEY = "ebt:inquiry-popup"; // "closed" | "sent"
+const KEY = "ebt:inquiry-popup"; // "sent" once the visitor subscribes
+const FIRST_DELAY = 5_000; // first appearance: 5 seconds
+const REPEAT_EVERY = 60_000; // then every 1 minute until they subscribe
 const HIDE_ON = ["/login", "/register", "/forgot-password", "/verify-email", "/get-started", "/contact"];
 
-/** Welcome pop-up that invites visitors to leave their name, mobile number and a message. Shown once per visitor. */
+/**
+ * Subscribe pop-up: name, mobile number, email and an optional message.
+ * Appears 5 seconds after the visitor lands, then again every minute until they subscribe.
+ */
 export function InquiryPopup() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [hp, setHp] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const subscribed = useRef(false);
   const firstField = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (HIDE_ON.some((p) => pathname.startsWith(p))) return;
-    let seen: string | null = null;
     try {
-      seen = localStorage.getItem(KEY);
+      if (localStorage.getItem(KEY) === "sent") return;
     } catch {}
-    if (seen) return;
-    const t = setTimeout(() => setOpen(true), 4000);
-    return () => clearTimeout(t);
+    const show = () => {
+      if (!subscribed.current) setOpen(true);
+    };
+    const first = setTimeout(show, FIRST_DELAY);
+    const repeat = setInterval(show, REPEAT_EVERY);
+    return () => {
+      clearTimeout(first);
+      clearInterval(repeat);
+    };
   }, [pathname]);
 
   useEffect(() => {
@@ -40,24 +51,15 @@ export function InquiryPopup() {
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
     setTimeout(() => firstField.current?.focus(), 50);
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     document.addEventListener("keydown", onKey);
     return () => {
       document.documentElement.style.overflow = prev;
       document.removeEventListener("keydown", onKey);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const remember = (v: string) => {
-    try {
-      localStorage.setItem(KEY, v);
-    } catch {}
-  };
-  const close = () => {
-    setOpen(false);
-    if (!sent) remember("closed");
-  };
+  const close = () => setOpen(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +68,16 @@ export function InquiryPopup() {
     const res = await fetch("/api/inquiries", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name, phone, message, page: pathname, website: hp }),
+      body: JSON.stringify({ name, phone, email, message, page: pathname, website: hp }),
     }).catch(() => null);
     const json = res ? await res.json().catch(() => ({})) : {};
     setBusy(false);
     if (!res || !res.ok) return setError(json.error || "Something went wrong. Please try again.");
     setSent(true);
-    remember("sent");
+    subscribed.current = true;
+    try {
+      localStorage.setItem(KEY, "sent");
+    } catch {}
   };
 
   if (!open) return null;
@@ -90,10 +95,12 @@ export function InquiryPopup() {
             <MessageCircle className="size-5" aria-hidden />
           </span>
           <h2 id="inq-title" className="relative mt-4 text-2xl font-extrabold text-white">
-            {sent ? "Thank you!" : "Have a tax question?"}
+            {sent ? "Thank you!" : "Subscribe"}
           </h2>
           <p className="relative mt-1 text-sm text-white/70">
-            {sent ? "We've received your message. A tax professional will call you back shortly." : "Leave your details and a tax professional from Elite B Tax Services will call you back."}
+            {sent
+              ? "We've received your details. A tax professional will get back to you shortly."
+              : "Leave your details and a tax professional from Elite B Tax Services will get in touch."}
           </p>
         </div>
 
@@ -106,29 +113,62 @@ export function InquiryPopup() {
                 {site.phone.display}
               </a>
             </p>
-            <Button className="mt-6 w-full" onClick={() => setOpen(false)}>
+            <Button className="mt-6 w-full" onClick={close}>
               Continue browsing
             </Button>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-4 p-6 sm:p-8">
-            <div>
-              <Label htmlFor="inq-name">Name</Label>
-              <Input ref={firstField} id="inq-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required minLength={2} maxLength={80} placeholder="Your full name" />
+          <form onSubmit={submit} className="space-y-3 p-6 sm:p-8">
+            <div className="relative">
+              <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-subtle" aria-hidden />
+              <Input
+                ref={firstField}
+                id="inq-name"
+                aria-label="Name"
+                autoComplete="name"
+                className="pl-10"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                minLength={2}
+                maxLength={80}
+                placeholder="Name"
+              />
             </div>
-            <div>
-              <Label htmlFor="inq-phone">Mobile number</Label>
-              <div className="relative">
-                <Phone className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-subtle" aria-hidden />
-                <Input id="inq-phone" type="tel" inputMode="tel" autoComplete="tel" className="pl-10" value={phone} onChange={(e) => setPhone(e.target.value)} required minLength={7} maxLength={20} placeholder="+1 or +91 mobile number" />
-              </div>
+            <div className="relative">
+              <Phone className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-subtle" aria-hidden />
+              <Input
+                id="inq-phone"
+                aria-label="Phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                className="pl-10"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+                minLength={7}
+                maxLength={20}
+                placeholder="Phone"
+              />
             </div>
-            <div>
-              <Label htmlFor="inq-msg">
-                Message <span className="font-normal text-subtle">(optional)</span>
-              </Label>
-              <Textarea id="inq-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} maxLength={1000} placeholder="How can we help?" />
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-subtle" aria-hidden />
+              <Input
+                id="inq-email"
+                aria-label="Email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                className="pl-10"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                maxLength={160}
+                placeholder="Email"
+              />
             </div>
+            <Textarea id="inq-msg" aria-label="Message" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} maxLength={1000} placeholder="Message (optional)" />
             <input type="text" value={hp} onChange={(e) => setHp(e.target.value)} tabIndex={-1} autoComplete="off" className="absolute -left-[9999px]" aria-hidden />
             {error && (
               <p className="text-sm text-danger-600" role="alert">
@@ -139,7 +179,7 @@ export function InquiryPopup() {
               {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Send aria-hidden />} Submit
             </Button>
             <button type="button" onClick={close} className="w-full text-center text-sm font-medium text-muted hover:text-navy-900">
-              No thanks
+              Close
             </button>
           </form>
         )}
