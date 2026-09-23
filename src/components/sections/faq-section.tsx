@@ -7,7 +7,7 @@ import Link from "next/link";
 export function FaqSection({
   faqs,
   title = "Frequently asked questions",
-  eyebrow = "FAQ",
+  eyebrow = ".",
   subtitle,
   withSchema = true,
   showAllLink = true,

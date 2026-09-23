@@ -295,6 +295,32 @@ export class PostgresRepository implements Repository {
     return rows.map(toPortalDoc);
   }
 
+  async listAllPortalDocuments(opts: { kind?: PortalDocKind; customerId?: string; limit?: number; offset?: number } = {}) {
+    const where: string[] = [];
+    const params: unknown[] = [];
+    if (opts.kind) {
+      params.push(opts.kind);
+      where.push(`kind = $${params.length}`);
+    }
+    if (opts.customerId) {
+      params.push(opts.customerId);
+      where.push(`customer_id = $${params.length}`);
+    }
+    const { rows } = await pool().query(
+      `SELECT * FROM portal_documents ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+       ORDER BY created_at DESC LIMIT ${Number(opts.limit ?? 200)} OFFSET ${Number(opts.offset ?? 0)}`,
+      params,
+    );
+    return rows.map(toPortalDoc);
+  }
+
+  async countPortalDocuments() {
+    const { rows } = await pool().query(`SELECT kind, count(*)::int AS n FROM portal_documents GROUP BY kind`);
+    const counts: Record<PortalDocKind, number> = { upload: 0, draft: 0, final: 0 };
+    for (const r of rows) counts[r.kind as PortalDocKind] = r.n as number;
+    return counts;
+  }
+
   async getPortalDocument(id: string) {
     const { rows } = await pool().query(`SELECT * FROM portal_documents WHERE id = $1`, [id]);
     return rows[0] ? toPortalDoc(rows[0]) : null;

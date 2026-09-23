@@ -13,7 +13,12 @@ export const UPLOAD_LIMITS = {
     "application/vnd.ms-excel": [".xls"],
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
     "text/csv": [".csv"],
+    "application/zip": [".zip"],
+    "application/x-zip-compressed": [".zip"],
   } as Record<string, string[]>,
 };
 
-export const acceptedExtensions = Object.values(UPLOAD_LIMITS.accept).flat();
+export const acceptedExtensions = [...new Set(Object.values(UPLOAD_LIMITS.accept).flat())];
+
+/** Human-readable list shown in the upload UI and in error messages. */
+export const acceptedLabel = "PDF, JPG, PNG, HEIC, DOC(X), XLS(X), CSV or ZIP";

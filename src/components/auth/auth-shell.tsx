@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { BadgeCheck, Clock, FolderLock, MessagesSquare, ShieldCheck } from "lucide-react";
 import { AuthCard, ForgotPasswordForm } from "./auth-form";
+import { SessionNotice } from "./session-notice";
 
 const perks = [
   { icon: Clock, title: "Track your filing", body: "See each step from documents to IRS acceptance." },
@@ -45,6 +46,7 @@ export function AuthShell({ mode }: { mode: "login" | "register" | "forgot" }) {
           {/* Form */}
           <div className="p-6 sm:p-10 lg:p-12">
             <Suspense>
+              <SessionNotice />
               {mode === "forgot" ? <ForgotPasswordForm /> : <AuthCard initialTab={mode} />}
             </Suspense>
           </div>

@@ -3,6 +3,7 @@ import { getRepository } from "@/lib/db";
 import { requireAdmin } from "@/lib/admin-guard";
 import { storePortalFile, publicDoc } from "@/lib/portal-server";
 import { portalTaxYears } from "@/lib/portal";
+import { onDocumentShared } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -29,5 +30,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     note,
     status: kind === "draft" ? "awaiting_review" : null,
   });
+  void onDocumentShared(customer, doc);
   return NextResponse.json({ ok: true, document: publicDoc(doc) }, { status: 201 });
 }

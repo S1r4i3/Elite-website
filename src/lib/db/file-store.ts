@@ -222,6 +222,22 @@ export class FileRepository implements Repository {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
+  async listAllPortalDocuments(opts: { kind?: PortalDocKind; customerId?: string; limit?: number; offset?: number } = {}) {
+    const db = await read();
+    const rows = (db.portalDocuments ?? [])
+      .filter((d) => (opts.kind ? d.kind === opts.kind : true) && (opts.customerId ? d.customerId === opts.customerId : true))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const offset = opts.offset ?? 0;
+    return rows.slice(offset, offset + (opts.limit ?? 200));
+  }
+
+  async countPortalDocuments() {
+    const db = await read();
+    const counts: Record<PortalDocKind, number> = { upload: 0, draft: 0, final: 0 };
+    for (const d of db.portalDocuments ?? []) counts[d.kind] += 1;
+    return counts;
+  }
+
   async getPortalDocument(id: string) {
     const db = await read();
     return db.portalDocuments?.find((d) => d.id === id) ?? null;

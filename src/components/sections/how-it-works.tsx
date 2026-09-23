@@ -14,7 +14,7 @@ export function HowItWorks({ title = "How It Works", subtitle = "A simple, guide
     <section className="section-y relative isolate overflow-hidden" aria-labelledby="how-heading">
       <ParallaxDecor flip />
       <div className="container-x">
-        <SectionHeader as={as} eyebrow="Simple process" title={<span id="how-heading">{title}</span>} subtitle={subtitle} />
+        <SectionHeader as={as}  title={<span id="how-heading">{title}</span>} subtitle={subtitle} />
         <ol className="relative mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {/* Timeline line (desktop) */}
           <div className="absolute left-0 right-0 top-7 hidden h-0.5 lg:block" aria-hidden>

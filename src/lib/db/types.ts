@@ -128,6 +128,9 @@ export interface Repository {
   // Client portal documents
   createPortalDocument(doc: NewPortalDocument): Promise<PortalDocument>;
   listPortalDocuments(customerId: string, kind?: PortalDocKind): Promise<PortalDocument[]>;
+  /** Every client's documents, newest first — used by the admin API. */
+  listAllPortalDocuments(opts?: { kind?: PortalDocKind; customerId?: string; limit?: number; offset?: number }): Promise<PortalDocument[]>;
+  countPortalDocuments(): Promise<Record<PortalDocKind, number>>;
   getPortalDocument(id: string): Promise<PortalDocument | null>;
   updatePortalDocument(id: string, patch: Partial<Pick<PortalDocument, "status" | "clientComment" | "note">>): Promise<PortalDocument | null>;
   deletePortalDocument(id: string): Promise<void>;

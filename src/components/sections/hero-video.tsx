@@ -2,21 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Full-bleed looping background video for the home hero.
- *
- * Drop your footage into /public/videos:
- *   - hero.mp4   (required, H.264, ~1920x1080, 10–20s loop, ideally < 6 MB)
- *   - hero.webm  (optional, smaller VP9/AV1 version)
- *   - hero.jpg   (optional poster frame shown while the video loads)
- *
- * Behaviour:
- * - Muted, looping, inline autoplay (required for autoplay on iOS/Android).
- * - Fades in only once the video is actually playing; if the file is missing or
- *   fails to load, nothing is shown and the existing slate background remains.
- * - Skipped entirely for visitors who prefer reduced motion or are on Save-Data.
- * - Pauses when the hero scrolls out of view to save battery/CPU.
- */
 export function HeroVideo({ src = "/videos/hero" }: { src?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [enabled, setEnabled] = useState(false);

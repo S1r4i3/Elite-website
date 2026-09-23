@@ -24,7 +24,6 @@ const cols = [
       { label: "Entity Formation", href: "/entity-formation" },
       { label: "Corporate Tax", href: "/corporate-tax" },
       { label: "Bookkeeping", href: "/bookkeeping" },
-      { label: "Payroll", href: "/payroll" },
     ],
   },
   {
@@ -35,8 +34,8 @@ const cols = [
       { label: "Contact", href: "/contact" },
       { label: "FAQs", href: "/faq" },
       { label: "Reviews", href: "/reviews" },
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms & Conditions", href: "/terms" },
+      { label: "Privacy Policy", href: "" },
+      { label: "Terms & Conditions", href: "" },
     ],
   },
 ];
@@ -109,9 +108,7 @@ export function Footer() {
           <p>
             © Elite B Tax Services. All rights reserved.
           </p>
-          <p className="max-w-xl md:text-right">
-            Information on this site is general in nature and is not tax, legal or financial advice for your specific situation.
-          </p>
+          
         </div>
       </div>
     </footer>

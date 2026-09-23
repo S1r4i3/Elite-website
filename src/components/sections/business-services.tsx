@@ -50,7 +50,7 @@ function BusinessVisual() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">
             <p className="text-[11px] text-white/50">Next filing</p>
-            <p className="mt-1 text-sm font-semibold text-white">Form 1120-S · Mar 15</p>
+            <p className="mt-1 text-sm font-semibold text-white">Form 1120-S</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
               <div className="h-full w-4/5 rounded-full bg-brand-500" />
             </div>
@@ -60,7 +60,6 @@ function BusinessVisual() {
             <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-white">
               <Check className="size-4 text-green-300" /> Q3 941 filed
             </p>
-            <p className="mt-2 text-[11px] text-white/50">Next run in 4 days</p>
           </div>
         </div>
       </div>
@@ -79,7 +78,7 @@ export function BusinessServices() {
             dark
             align="left"
             title={<span id="business-heading">Individual Business Tax Services</span>}
-            subtitle="From forming your company to payroll and year-end returns — one team that understands both your books and your taxes."
+            subtitle="From forming your company and year-end returns — one team that understands both your books and your taxes."
           />
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">
             {list.map(({ icon: I, label, href }) => (
@@ -93,11 +92,7 @@ export function BusinessServices() {
               </li>
             ))}
           </ul>
-          <Button asChild size="lg" variant="white" className="mt-9">
-            <Link href="/business-services">
-              Explore Business Services <ArrowRight aria-hidden />
-            </Link>
-          </Button>
+          
         </div>
         <div className="lg:col-span-7 lg:pl-8" data-reveal>
           <BusinessVisual />

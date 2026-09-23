@@ -1,8 +1,12 @@
-import type { Metadata } from "next";
+import { privatePageMetadata } from "@/lib/seo";
 import { Suspense } from "react";
 import { VerifyEmail } from "@/components/auth/verify-email";
 
-export const metadata: Metadata = { title: "Verify email", robots: { index: false, follow: false } };
+export const metadata = privatePageMetadata({
+  title: "Verify email",
+  description: "Confirm your email address to activate your Elite Tax Services client portal account.",
+  path: "/verify-email",
+});
 
 export default function VerifyEmailPage() {
   return (

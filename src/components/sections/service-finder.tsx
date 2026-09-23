@@ -202,7 +202,6 @@ export function ServiceFinder() {
       <ParallaxDecor />
       <div className="container-x">
         <SectionHeader
-          eyebrow="Service finder"
           title={<span id="finder-heading">Not Sure Which Tax Service You Need?</span>}
           subtitle="Answer a few simple questions and we'll point you in the right direction."
         />

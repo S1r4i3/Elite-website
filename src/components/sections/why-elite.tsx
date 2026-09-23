@@ -17,7 +17,7 @@ export function WhyElite() {
     <section className="section-y relative isolate overflow-hidden" aria-labelledby="why-heading">
       <ParallaxDecor />
       <div className="container-x">
-        <SectionHeader eyebrow="Why Elite" title={<span id="why-heading">Why Clients Choose Elite</span>} subtitle="Accessible, approachable and accountable — tax help that's easy to understand." />
+        <SectionHeader title={<span id="why-heading">Why Clients Choose Elite</span>} subtitle="Accessible, approachable and accountable — tax help that's easy to understand." />
         <div className="mt-12 grid gap-px overflow-hidden rounded-[20px] border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {reasons.map(({ icon: I, title, body }) => (
             <div key={title} data-reveal className="bg-white p-6 sm:p-8">

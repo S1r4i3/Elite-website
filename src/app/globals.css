@@ -299,6 +299,61 @@ html.custom-cursor-on [contenteditable="true"] { cursor: auto !important; }
   100% { opacity: 0; transform: translateY(10px); }
 }
 
+
+/* ───────── U.S. ⇄ India connection graphic ───────── */
+
+/* Dashes travelling along the connector line */
+@keyframes dash-flow { to { stroke-dashoffset: -32; } }
+.dash-flow { animation: dash-flow 1.6s linear infinite; }
+
+/* Vertical connector on small screens */
+@keyframes dash-flow-y { to { background-position: 0 16px; } }
+.dash-v {
+  width: 2px;
+  height: 26px;
+  background-image: linear-gradient(to bottom, var(--color-brand-600) 50%, transparent 50%);
+  background-size: 2px 8px;
+  animation: dash-flow-y 1s linear infinite;
+}
+
+/* Radar rings around the centre logo */
+@keyframes hub-pulse {
+  0%   { transform: scale(1);    opacity: 0.5; }
+  70%  { transform: scale(1.55); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+.hub-pulse::before,
+.hub-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--color-brand-600);
+  animation: hub-pulse 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+.hub-pulse::after { animation-delay: 1.4s; }
+
+/* Data packet sliding between the two panels */
+@keyframes packet-x {
+  0%       { offset-distance: 0%;   opacity: 0; }
+  10%, 90% { opacity: 1; }
+  100%     { offset-distance: 100%; opacity: 0; }
+}
+.packet { animation: packet-x 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.packet-back { animation-delay: 1.7s; animation-direction: reverse; }
+
+/* Ticks fading in one after another */
+.tick-in > li { animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.tick-in > li:nth-child(1) { animation-delay: 0.1s; }
+.tick-in > li:nth-child(2) { animation-delay: 0.2s; }
+.tick-in > li:nth-child(3) { animation-delay: 0.3s; }
+.tick-in > li:nth-child(4) { animation-delay: 0.4s; }
+
+/* Panels lift a little on hover */
+.link-panel { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease; }
+.link-panel:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); border-color: var(--color-brand-200); }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -308,4 +363,5 @@ html.custom-cursor-on [contenteditable="true"] { cursor: auto !important; }
   }
   .js [data-reveal] { opacity: 1; transform: none; }
   .btn-shine::after, .gradient-border::before { display: none; }
+  .hub-pulse::before, .hub-pulse::after, .packet { display: none; }
 }

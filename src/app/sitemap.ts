@@ -2,13 +2,35 @@ import type { MetadataRoute } from "next";
 import { services } from "@/lib/services";
 import { absoluteUrl } from "@/lib/utils";
 
+/**
+ * Every indexable URL, weighted so search engines crawl the money pages first.
+ * Private areas (portal, admin, auth) are excluded here and in robots.ts.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const core = ["/", "/tax-services", "/business-services", "/how-it-works", "/about", "/reviews", "/faq", "/contact", "/get-started"];
-  const legal = ["/privacy", "/terms"];
+  const ogImage = absoluteUrl("/opengraph-image");
+
+  const core: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
+    { path: "/", priority: 1, changeFrequency: "weekly" },
+    { path: "/tax-services", priority: 0.9, changeFrequency: "weekly" },
+    { path: "/business-services", priority: 0.9, changeFrequency: "weekly" },
+    { path: "/get-started", priority: 0.9, changeFrequency: "monthly" },
+    { path: "/contact", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/how-it-works", priority: 0.7, changeFrequency: "monthly" },
+    { path: "/about", priority: 0.7, changeFrequency: "monthly" },
+    { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
+    { path: "/reviews", priority: 0.6, changeFrequency: "weekly" },
+  ];
+
   return [
-    ...core.map((p) => ({ url: absoluteUrl(p), lastModified: now, changeFrequency: "weekly" as const, priority: p === "/" ? 1 : 0.8 })),
-    ...services.map((s) => ({ url: absoluteUrl(`/${s.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.9 })),
-    ...legal.map((p) => ({ url: absoluteUrl(p), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),
+    ...core.map((c) => ({ url: absoluteUrl(c.path), lastModified: now, changeFrequency: c.changeFrequency, priority: c.priority, images: [ogImage] })),
+    ...services.map((s) => ({
+      url: absoluteUrl(`/${s.slug}`),
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+      images: [ogImage],
+    })),
+    ...["/privacy", "/terms"].map((p) => ({ url: absoluteUrl(p), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),
   ];
 }

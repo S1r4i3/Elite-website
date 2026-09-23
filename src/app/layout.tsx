@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { RevealObserver } from "@/components/layout/reveal";
 import { JsonLd } from "@/components/seo/json-ld";
-import { organizationSchema } from "@/lib/seo";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 // Self-hosted variable fonts (no third-party requests; SIL Open Font License).
@@ -31,9 +31,23 @@ export const metadata: Metadata = {
     "NRI tax services",
     "Indian tax services USA",
   ],
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  publisher: site.legalName,
+  category: "Finance",
+  alternates: { canonical: site.url },
   openGraph: { type: "website", siteName: site.name, locale: "en_US", url: site.url },
+  appleWebApp: { capable: true, title: site.shortName, statusBarStyle: "black-translucent" },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
+  },
   twitter: { card: "summary_large_image" },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
+  },
   formatDetection: { telephone: false },
 };
 
@@ -53,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <RevealObserver />
         <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
       </body>
     </html>
   );

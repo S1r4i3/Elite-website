@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { saveObject, readObject } from "@/lib/storage";
-import { UPLOAD_LIMITS } from "@/lib/validation/upload";
+import { UPLOAD_LIMITS, acceptedLabel } from "@/lib/validation/upload";
 import type { PortalDocument } from "@/lib/db";
 
 /** Validates an uploaded File and stores it privately. Returns storage info or an error response. */
@@ -13,7 +13,7 @@ export async function storePortalFile(file: FormDataEntryValue | null, customerI
   if (file.size > UPLOAD_LIMITS.maxBytes) return { error: NextResponse.json({ ok: false, error: "File is larger than 15 MB." }, { status: 413 }) };
   const ext = path.extname(file.name).toLowerCase();
   if (!Object.values(UPLOAD_LIMITS.accept).flat().includes(ext)) {
-    return { error: NextResponse.json({ ok: false, error: "Unsupported file type. Use PDF, JPG, PNG, HEIC, DOC(X), XLS(X) or CSV." }, { status: 415 }) };
+    return { error: NextResponse.json({ ok: false, error: `Unsupported file type. Use ${acceptedLabel}.` }, { status: 415 }) };
   }
   const id = randomUUID();
   const storageKey = `portal/${customerId}/${id}${ext}`;

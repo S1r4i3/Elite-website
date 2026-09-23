@@ -1,7 +1,11 @@
-import type { Metadata } from "next";
+import { privatePageMetadata } from "@/lib/seo";
 import { AuthShell } from "@/components/auth/auth-shell";
 
-export const metadata: Metadata = { title: "Create account", robots: { index: false, follow: false } };
+export const metadata = privatePageMetadata({
+  title: "Create account",
+  description: "Create your Elite Tax Services client account to file securely online with a dedicated tax professional.",
+  path: "/register",
+});
 
 export default function RegisterPage() {
   return <AuthShell mode="register" />;

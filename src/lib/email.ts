@@ -82,3 +82,51 @@ export async function sendOtpEmail(to: string, code: string, purpose: "login" | 
     html,
   });
 }
+
+/** Tells a client that a draft estimation or final document is waiting in their dashboard. */
+export async function sendDocumentSharedEmail(to: string, opts: { name?: string; kind: "draft" | "final"; fileName: string; note?: string | null; link: string }) {
+  const t = getTransporter();
+  if (!t) throw new Error("EMAIL_NOT_CONFIGURED");
+  const what = opts.kind === "draft" ? "draft estimation" : "final document";
+  const html = layout(`
+        <h1 style="margin:0 0 16px;font-size:22px;color:#17212b">Your ${esc(what)} is ready</h1>
+        <p style="margin:0 0 12px;font-size:15px;line-height:1.6">${opts.name ? `Hi ${esc(opts.name)},` : "Hi,"}</p>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.6">We've added <strong>${esc(opts.fileName)}</strong> to your ${esc(site.name)} dashboard.${
+          opts.kind === "draft" ? " Please review it and approve it or request changes." : ""
+        }</p>
+        ${opts.note ? `<p style="margin:0 0 20px;padding:14px 16px;background:#f4f5f7;border-radius:10px;font-size:14px;line-height:1.6">${esc(opts.note)}</p>` : ""}
+        <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 26px"><tr><td style="border-radius:10px;background:#c8102e">
+          <a href="${esc(opts.link)}" target="_blank" style="display:inline-block;padding:15px 34px;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px">Open my dashboard</a>
+        </td></tr></table>`);
+  await t.sendMail({
+    from: process.env.EMAIL_FROM || `"${site.name}" <${process.env.SMTP_USER || site.email}>`,
+    to,
+    subject: `Your ${what} is ready — ${site.name}`,
+    text: `${opts.name ? `Hi ${opts.name},\n\n` : ""}We've added ${opts.fileName} to your ${site.name} dashboard.${opts.note ? `\n\n${opts.note}` : ""}\n\n${opts.link}`,
+    html,
+  });
+}
+
+/** Internal alert: a visitor filled in the Subscribe pop-up on the website. */
+export async function sendInquiryAlertEmail(i: { name: string; phone: string; email?: string | null; message?: string | null; page?: string | null }) {
+  const t = getTransporter();
+  const to = process.env.NOTIFY_EMAIL || process.env.EMAIL_FROM;
+  if (!t || !to) return;
+  const rows = [
+    ["Name", i.name],
+    ["Mobile", i.phone],
+    ["Email", i.email || "—"],
+    ["Message", i.message || "—"],
+    ["Page", i.page || "—"],
+  ]
+    .map(([k, v]) => `<tr><td style="padding:6px 12px 6px 0;color:#66727f;font-size:13px;white-space:nowrap">${esc(k)}</td><td style="padding:6px 0;font-size:14px">${esc(v)}</td></tr>`)
+    .join("");
+  await t.sendMail({
+    from: process.env.EMAIL_FROM || `"${site.name}" <${process.env.SMTP_USER || site.email}>`,
+    to,
+    replyTo: i.email || undefined,
+    subject: `New website inquiry — ${i.name}`,
+    text: `New inquiry\n\nName: ${i.name}\nMobile: ${i.phone}\nEmail: ${i.email || "-"}\nMessage: ${i.message || "-"}\nPage: ${i.page || "-"}`,
+    html: layout(`<h1 style="margin:0 0 16px;font-size:20px">New website inquiry</h1><table role="presentation" cellpadding="0" cellspacing="0">${rows}</table>`),
+  });
+}

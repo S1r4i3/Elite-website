@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Camera, CheckCircle2, FileText, Lock, RotateCcw, UploadCloud, X, AlertCircle } from "lucide-react";
-import { UPLOAD_LIMITS, acceptedExtensions } from "@/lib/validation/upload";
+import { UPLOAD_LIMITS, acceptedExtensions, acceptedLabel } from "@/lib/validation/upload";
 import { cn, formatBytes } from "@/lib/utils";
 
 export type UploadItem = {
@@ -141,7 +141,7 @@ export function FileDropzone({ category = "other", onChange, onBusyChange, compa
           </button>
         </p>
         <p id={descId} className="mt-1 text-[13px] text-muted">
-          PDF, JPG, PNG, HEIC, DOC, XLS or CSV · up to 15 MB each · max {UPLOAD_LIMITS.maxFiles} files
+          {acceptedLabel} · up to 15 MB each · max {UPLOAD_LIMITS.maxFiles} files
         </p>
         <div className="mt-4 flex justify-center sm:hidden">
           <button

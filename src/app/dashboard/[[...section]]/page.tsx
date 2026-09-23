@@ -29,6 +29,7 @@ import { ProfileForm, PasswordForm } from "@/components/dashboard/profile-forms"
 import { DocActions } from "@/components/dashboard/doc-actions";
 import { DraftCard } from "@/components/dashboard/draft-card";
 import { StatusBadge } from "@/components/dashboard/status-badge";
+import { TimeZones } from "@/components/dashboard/time-zones";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,9 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
   const current = allDashboardSections.find((s) => s.slug === slug);
   if (!current || ((await params).section?.length ?? 0) > 1) notFound();
   const customer = await getCurrentCustomer();
-  if (!customer) redirect(`/login?next=/dashboard${slug ? `/${slug}` : ""}`);
+  // The cookie is valid but the account is gone (deleted, or a fresh database):
+  // clear the session instead of bouncing between /dashboard and /login.
+  if (!customer) redirect(`/api/auth/expired?next=/dashboard${slug ? `/${slug}` : ""}`);
 
   const all = await getRepository().listPortalDocuments(customer.id);
   const uploads = all.filter((d) => d.kind === "upload");
@@ -159,13 +162,16 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
               </h1>
               <p className="mt-2 max-w-2xl text-muted">{current.description}</p>
             </div>
-            {slug === "" && (
-              <Button asChild className="btn-shine">
-                <Link href="/dashboard/upload-documents">
-                  <UploadCloud aria-hidden /> Upload documents
-                </Link>
-              </Button>
-            )}
+            <div className="flex flex-col items-start gap-3 sm:items-end">
+              <TimeZones className="justify-start sm:justify-end" />
+              {slug === "" && (
+                <Button asChild className="btn-shine">
+                  <Link href="/dashboard/upload-documents">
+                    <UploadCloud aria-hidden /> Upload documents
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="mt-8">
