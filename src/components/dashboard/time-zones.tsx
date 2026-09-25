@@ -20,7 +20,7 @@ const time = (tz: string, now: Date) =>
  * Small live clock strip for the client portal header.
  * Rendered only after mount, so the server and browser never disagree about the time.
  */
-export function TimeZones({ className = "" }: { className?: string }) {
+export function TimeZones({ className = "", wide = false }: { className?: string; wide?: boolean }) {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -28,6 +28,26 @@ export function TimeZones({ className = "" }: { className?: string }) {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
+
+  if (wide) {
+    // Reserve the height before mount so the page doesn't jump when the clocks appear.
+    return (
+      <div
+        className={`grid grid-cols-2 gap-2 rounded-2xl border border-line bg-white p-2 shadow-sm sm:grid-cols-4 lg:grid-cols-7 ${className}`}
+        aria-label="Current time by zone"
+      >
+        {ZONES.map((z) => (
+          <div key={z.label} title={z.title} className="rounded-xl bg-canvas px-3 py-2.5 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-subtle">{z.label}</p>
+            <p className="mt-0.5 font-mono text-base font-semibold tabular-nums text-navy-900">
+              {now ? <time dateTime={now.toISOString()}>{time(z.tz, now)}</time> : <span className="text-subtle">—</span>}
+            </p>
+            <p className="truncate text-[11px] text-muted">{z.title}</p>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   if (!now) return null;
 

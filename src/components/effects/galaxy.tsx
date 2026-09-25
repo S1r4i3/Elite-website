@@ -202,7 +202,7 @@ export default function Galaxy({
     const ctn = ctnDom.current;
     let renderer;
     try {
-      renderer = new Renderer({ alpha: transparent, premultipliedAlpha: false, dpr: Math.min(window.devicePixelRatio || 1, 1.5) });
+      renderer = new Renderer({ alpha: transparent, premultipliedAlpha: false, dpr: Math.min(window.devicePixelRatio || 1, 1.25) });
     } catch {
       return; // No WebGL: leave the section's normal background.
     }
@@ -262,8 +262,11 @@ export default function Galaxy({
     let visible = true;
 
     function update(t) {
+      if (!visible || document.hidden) {
+        animateId = 0; // fully paused while scrolled out of view or the tab is hidden
+        return;
+      }
       animateId = requestAnimationFrame(update);
-      if (!visible) return; // paused while scrolled out of view
       if (!disableAnimation) {
         program.uniforms.uTime.value = t * 0.001;
         program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
@@ -280,8 +283,18 @@ export default function Galaxy({
     animateId = requestAnimationFrame(update);
     ctn.appendChild(gl.canvas);
 
-    const io = "IntersectionObserver" in window ? new IntersectionObserver(([e]) => (visible = e.isIntersecting)) : null;
+    const resume = () => {
+      if (visible && !document.hidden && !animateId) animateId = requestAnimationFrame(update);
+    };
+    const io =
+      "IntersectionObserver" in window
+        ? new IntersectionObserver(([e]) => {
+            visible = e.isIntersecting;
+            resume();
+          })
+        : null;
     io?.observe(ctn);
+    document.addEventListener("visibilitychange", resume);
 
     // Listen on the surrounding section so the cards on top still receive clicks.
     const target = ctn.closest("section") || ctn.parentElement || ctn;
@@ -301,6 +314,7 @@ export default function Galaxy({
     return () => {
       cancelAnimationFrame(animateId);
       io?.disconnect();
+      document.removeEventListener("visibilitychange", resume);
       window.removeEventListener("resize", resize);
       if (mouseInteraction) {
         target.removeEventListener("mousemove", handleMouseMove);

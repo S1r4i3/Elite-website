@@ -47,7 +47,10 @@ export function MotionEffects() {
     let pending = 0;
     const mo = new MutationObserver(() => {
       clearTimeout(pending);
-      pending = window.setTimeout(collect, 150);
+      pending = window.setTimeout(() => {
+        collect();
+        schedule();
+      }, 150);
     });
     mo.observe(document.body, { childList: true, subtree: true });
 
@@ -74,13 +77,21 @@ export function MotionEffects() {
         const d = parseFloat(el.dataset.depth || "0");
         el.style.translate = `${(smx * d).toFixed(1)}px ${(smy * d).toFixed(1)}px`;
       }
-      raf = requestAnimationFrame(frame);
+      // Keep animating only while the mouse-depth smoothing is still settling.
+      const settling = depth.length > 0 && Math.abs(mx - smx) + Math.abs(my - smy) > 0.002;
+      raf = settling ? requestAnimationFrame(frame) : 0;
     };
-    raf = requestAnimationFrame(frame);
+    const schedule = () => {
+      if (!raf && running) raf = requestAnimationFrame(frame);
+    };
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
 
     const onMove = (e: MouseEvent) => {
       mx = (e.clientX / window.innerWidth) * 2 - 1;
       my = (e.clientY / window.innerHeight) * 2 - 1;
+      if (depth.length) schedule();
     };
 
     // Tilt + magnetic (event delegation so it works on newly rendered elements too)
@@ -130,6 +141,8 @@ export function MotionEffects() {
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
       clearTimeout(pending);
       mo.disconnect();
       window.removeEventListener("mousemove", onMove);

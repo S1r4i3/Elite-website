@@ -36,9 +36,12 @@ export function CustomCursor() {
       ry += (y - ry) * 0.18;
       d.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
       r.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
-      raf = requestAnimationFrame(loop);
+      // Stop when the ring has caught up — no work at all while the mouse is still.
+      raf = Math.abs(x - rx) + Math.abs(y - ry) > 0.2 ? requestAnimationFrame(loop) : 0;
     };
-    raf = requestAnimationFrame(loop);
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(loop);
+    };
 
     const setState = (target: Element | null) => {
       const field = target?.closest("input, textarea, select, [contenteditable='true']");
@@ -59,6 +62,7 @@ export function CustomCursor() {
         d.style.opacity = r.style.opacity = "1";
       }
       setState(e.target as Element);
+      kick();
     };
     const onDown = () => r.classList.add("is-down");
     const onUp = () => r.classList.remove("is-down");

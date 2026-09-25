@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNearViewport } from "./use-near-viewport";
 
 const Galaxy = dynamic(() => import("./galaxy"), { ssr: false });
 
@@ -12,6 +13,8 @@ const Galaxy = dynamic(() => import("./galaxy"), { ssr: false });
 export function ServicesGalaxy() {
   const [mode, setMode] = useState<"none" | "static" | "live">("none");
   const [reduce, setReduce] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  const near = useNearViewport(box);
 
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 768px)").matches;
@@ -20,9 +23,9 @@ export function ServicesGalaxy() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
+    <div ref={box} className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
       {mode === "static" && <div className="static-stars absolute inset-0" />}
-      {mode === "live" && (
+      {mode === "live" && near && (
         <Galaxy
           className="absolute inset-0"
           mouseRepulsion

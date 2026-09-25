@@ -2,11 +2,14 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { createHash, createHmac } from "node:crypto";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { DOCUMENTS_BUCKET } from "@/lib/supabase/config";
 
 /**
  * Document storage.
  *
- *  • Local disk (default) — good for `npm run dev` and for a VPS with a persistent disk.
+ *  • Supabase Storage — used automatically when the Supabase keys are set.
+ *  • Local disk — good for `npm run dev` and for a VPS with a persistent disk.
  *  • S3-compatible object storage — used automatically when S3_BUCKET is set.
  *    Works with AWS S3, Cloudflare R2, DigitalOcean Spaces, Backblaze B2, Supabase Storage.
  *    Required on Vercel, whose filesystem is wiped on every deploy.
@@ -15,11 +18,12 @@ import { createHash, createHmac } from "node:crypto";
  * the authenticated routes in /api/me/* and /api/v1/admin/*.
  */
 
+const useSupabase = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 const useS3 = () => Boolean(process.env.S3_BUCKET);
 const root = () => path.resolve(process.cwd(), process.env.UPLOAD_DIR || ".data/uploads");
 
 /** Which driver is active — handy for /api/health and the setup checklist. */
-export const storageDriver = () => (useS3() ? "s3" : "local");
+export const storageDriver = () => (useSupabase() ? "supabase" : useS3() ? "s3" : "local");
 
 // ---------------------------------------------------------------- local disk
 
@@ -90,7 +94,14 @@ async function s3Request(method: "PUT" | "GET" | "DELETE", key: string, body?: B
 
 // ---------------------------------------------------------------- public API
 
-export async function saveObject(key: string, data: Buffer) {
+export async function saveObject(key: string, data: Buffer, contentType?: string) {
+  if (useSupabase()) {
+    const { error } = await supabaseAdmin()
+      .storage.from(DOCUMENTS_BUCKET)
+      .upload(key, data, { contentType: contentType || "application/octet-stream", upsert: true });
+    if (error) throw new Error(`Supabase Storage upload failed: ${error.message}`);
+    return key;
+  }
   if (useS3()) {
     await s3Request("PUT", key, data);
     return key;
@@ -102,6 +113,11 @@ export async function saveObject(key: string, data: Buffer) {
 }
 
 export async function readObject(key: string): Promise<Buffer> {
+  if (useSupabase()) {
+    const { data, error } = await supabaseAdmin().storage.from(DOCUMENTS_BUCKET).download(key);
+    if (error || !data) throw new Error(`Supabase Storage download failed: ${error?.message ?? "not found"}`);
+    return Buffer.from(await data.arrayBuffer());
+  }
   if (useS3()) {
     const res = await s3Request("GET", key);
     return Buffer.from(await res.arrayBuffer());
@@ -110,6 +126,11 @@ export async function readObject(key: string): Promise<Buffer> {
 }
 
 export async function deleteObject(key: string) {
+  if (useSupabase()) {
+    const { error } = await supabaseAdmin().storage.from(DOCUMENTS_BUCKET).remove([key]);
+    if (error) throw new Error(`Supabase Storage delete failed: ${error.message}`);
+    return;
+  }
   if (useS3()) {
     await s3Request("DELETE", key);
     return;

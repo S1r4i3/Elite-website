@@ -1,97 +1,162 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getRepository } from "@/lib/db";
-import { issueOtp } from "@/lib/otp";
-import { emailConfigured, sendOtpEmail } from "@/lib/email";
-import { hashPassword } from "@/lib/password";
+import { supabaseServer } from "@/lib/supabase/server";
+import { serviceRoleConfigured, supabaseAdmin } from "@/lib/supabase/admin";
+import { appUrl } from "@/lib/app-url";
 import { forgotSchema, registerSchema } from "@/lib/validation/auth";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendOtpEmail, sendVerificationEmail } from "@/lib/email";
 
-/** Public base URL for links in emails: APP_URL if set, otherwise the address the visitor is using. */
-function baseUrl(req: Request) {
-  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, "");
-  const url = new URL(req.url);
-  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || url.host;
-  const proto = req.headers.get("x-forwarded-proto") || url.protocol.replace(":", "");
-  return `${proto}://${host}`;
-}
+export const dynamic = "force-dynamic";
 
-/** `register`: emails a "Verify Email Address" link for a new account. `reset`: emails a 6-digit code for a forgotten password. */
+const isDev = process.env.NODE_ENV !== "production";
+
+/** Supabase's own mailer failed (SMTP login, blocked IP, provider down…). */
+const isMailerFailure = (e: { status?: number; message?: string; code?: string } | null) =>
+  !!e && (e.status === 500 || /sending|smtp|email.*(send|deliver)/i.test(e.message ?? "") || e.code === "unexpected_failure");
+
+const json = (body: Record<string, unknown>, status = 200) => NextResponse.json(body, { status });
+
+/**
+ * `register` — creates the account and emails a "Verify Email Address" link.
+ * `reset`    — emails a 6-digit recovery code.
+ *
+ * Primary path: Supabase Auth sends the email (Authentication → SMTP settings).
+ * Fallback: if Supabase can't send it, we create the link/code with the service
+ * role and send it through our own SMTP (SMTP_* in .env). In development, when
+ * no email can be sent at all, the link/code is returned so you can keep testing.
+ */
 export async function POST(req: Request) {
   if (!rateLimit(`otp-ip:${clientIp(req)}`, 8, 10 * 60_000).ok) {
-    return NextResponse.json({ ok: false, error: "Too many requests. Please wait a few minutes and try again." }, { status: 429 });
+    return json({ ok: false, error: "Too many requests. Please wait a few minutes and try again." }, 429);
   }
+
   const body = (await req.json().catch(() => ({}))) as { mode?: string };
   const mode = z.enum(["register", "reset"]).safeParse(body.mode);
-  if (!mode.success) return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
+  if (!mode.success) return json({ ok: false, error: "Invalid request." }, 400);
 
-  const repo = getRepository();
-  let email: string;
-  let payload: Record<string, unknown> | null = null;
-  let name: string | undefined;
+  return mode.data === "register" ? register(body) : reset(body);
+}
 
-  if (mode.data === "register") {
-    const parsed = registerSchema.safeParse(body);
-    if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message || "Please check your details." }, { status: 400 });
-    const d = parsed.data;
-    if (await repo.findCustomerByEmail(d.email)) {
-      return NextResponse.json({ ok: false, code: "ACCOUNT_EXISTS", error: "An account with this email already exists. Please log in instead." }, { status: 409 });
+/* ───────────────────────── register ───────────────────────── */
+
+async function register(body: unknown) {
+  const parsed = registerSchema.safeParse(body);
+  if (!parsed.success) return json({ ok: false, error: parsed.error.issues[0]?.message || "Please check your details." }, 400);
+  const d = parsed.data;
+  const email = d.email.trim().toLowerCase();
+  const metadata = {
+    first_name: d.firstName,
+    last_name: d.lastName,
+    phone: d.phone,
+    dob: d.dob,
+    state: d.state,
+    country: d.country,
+    address: d.address,
+  };
+  const next = "/?verified=1";
+
+  const supabase = await supabaseServer();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password: d.password,
+    options: { emailRedirectTo: `${appUrl()}/auth/callback?next=${encodeURIComponent(next)}`, data: metadata },
+  });
+
+  if (!error) {
+    // Supabase returns a user with no identities when the email is already registered.
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return json({ ok: false, code: "ACCOUNT_EXISTS", error: "An account with this email already exists. Please log in instead." }, 409);
     }
-    email = d.email;
-    name = d.firstName;
-    payload = {
-      firstName: d.firstName,
-      lastName: d.lastName,
-      phone: d.phone,
-      dob: d.dob,
-      state: d.state,
-      country: d.country,
-      address: d.address,
-      passwordHash: await hashPassword(d.password),
-    };
+    return json({ ok: true });
+  }
+
+  if (error.status === 429) {
+    return json({ ok: false, error: "Too many verification emails were sent. Please wait a minute and try again.", retryAfter: 60 }, 429);
+  }
+  if (!isMailerFailure(error) || !serviceRoleConfigured()) {
+    console.error("[register] signUp failed:", error.message);
+    return json({ ok: false, error: friendly(error.message) }, 400);
+  }
+
+  // ── Fallback: Supabase couldn't send the email. Create the link ourselves. ──
+  console.warn("[register] Supabase could not send the verification email:", error.message, "— using fallback");
+  const admin = supabaseAdmin();
+  let hashedToken: string | undefined;
+
+  const signup = await admin.auth.admin.generateLink({ type: "signup", email, password: d.password, options: { data: metadata } });
+  if (!signup.error) {
+    hashedToken = signup.data.properties?.hashed_token;
+  } else if (/already|registered|exists/i.test(signup.error.message)) {
+    // The address exists. Confirmed → tell them to log in; unconfirmed → refresh password + send a new link.
+    const { data: existing } = await admin.from("profiles").select("id").ilike("email", email).maybeSingle();
+    const user = existing?.id ? (await admin.auth.admin.getUserById(existing.id)).data.user : null;
+    if (!user || user.email_confirmed_at) {
+      return json({ ok: false, code: "ACCOUNT_EXISTS", error: "An account with this email already exists. Please log in instead." }, 409);
+    }
+    await admin.auth.admin.updateUserById(user.id, { password: d.password, user_metadata: metadata });
+    const magic = await admin.auth.admin.generateLink({ type: "magiclink", email });
+    if (magic.error) return json({ ok: false, error: friendly(magic.error.message) }, 400);
+    hashedToken = magic.data.properties?.hashed_token;
+    return deliverLink(email, d.firstName, hashedToken, "magiclink", next);
   } else {
-    const parsed = forgotSchema.safeParse(body);
-    if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message || "Please enter a valid email." }, { status: 400 });
-    const customer = await repo.findCustomerByEmail(parsed.data.email);
-    if (!customer) {
-      return NextResponse.json({ ok: false, code: "NO_ACCOUNT", error: "We couldn't find an account with this email." }, { status: 404 });
-    }
-    email = parsed.data.email;
-    name = customer.firstName;
+    console.error("[register] generateLink failed:", signup.error.message);
+    return json({ ok: false, error: friendly(signup.error.message) }, 400);
   }
+  return deliverLink(email, d.firstName, hashedToken, "signup", next);
+}
 
-  const devMode = !emailConfigured() && process.env.NODE_ENV !== "production";
-  if (!emailConfigured() && !devMode) {
-    return NextResponse.json({ ok: false, error: "Email verification is temporarily unavailable. Please call us." }, { status: 503 });
-  }
-
-  const isLink = mode.data === "register";
-  const issued = await issueOtp(email, mode.data, payload, { link: isLink });
-  if ("retryAfter" in issued) {
-    return NextResponse.json({ ok: false, retryAfter: issued.retryAfter, error: `Please wait ${issued.retryAfter}s before requesting another code.` }, { status: 429 });
-  }
-
-  const link = isLink ? `${baseUrl(req)}/verify-email?email=${encodeURIComponent(email)}&token=${encodeURIComponent(issued.code)}` : "";
-
-  if (devMode && isLink) {
-    console.info(`\n[auth] Email not configured — verification link for ${email}:\n${link}\n`);
-    return NextResponse.json({ ok: true, ...(process.env.AUTH_DEV_SHOW_CODE === "true" ? { devLink: link } : {}) });
-  }
-  if (devMode) {
-    // Email isn't configured: the code is only printed in the server terminal (never shown in the browser
-    // unless AUTH_DEV_SHOW_CODE=true), so accounts still can't be created without the real code.
-    console.info(`\n[auth] Email not configured — verification code for ${email} (${mode.data}): ${issued.code}\n`);
-    return NextResponse.json({ ok: true, ...(process.env.AUTH_DEV_SHOW_CODE === "true" ? { devCode: issued.code } : {}) });
-  }
-
+async function deliverLink(email: string, name: string, hashedToken: string | undefined, type: "signup" | "magiclink", next: string) {
+  if (!hashedToken) return json({ ok: false, error: "We couldn't create your verification link. Please try again." }, 500);
+  const link = `${appUrl()}/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=${type}&next=${encodeURIComponent(next)}`;
   try {
-    if (isLink) await sendVerificationEmail(email, link, name);
-    else await sendOtpEmail(email, issued.code, mode.data, name);
+    await sendVerificationEmail(email, link, name);
+    return json({ ok: true });
   } catch (err) {
-    console.error("[auth] failed to send code email", err);
-    await repo.deleteOtp(email, mode.data);
-    return NextResponse.json({ ok: false, error: "We couldn't send the email. Please try again shortly." }, { status: 502 });
+    console.error("[register] fallback email failed:", (err as Error).message);
+    if (isDev) {
+      console.warn(`[register] DEV verification link for ${email}:\n${link}`);
+      return json({ ok: true, devLink: link });
+    }
+    return json(
+      { ok: false, error: "Your account was created, but we couldn't send the verification email. Please try again in a few minutes or contact us." },
+      502,
+    );
   }
-  return NextResponse.json({ ok: true });
+}
+
+/* ───────────────────────── reset ───────────────────────── */
+
+async function reset(body: unknown) {
+  const parsed = forgotSchema.safeParse(body);
+  if (!parsed.success) return json({ ok: false, error: parsed.error.issues[0]?.message || "Please enter a valid email." }, 400);
+  const email = parsed.data.email.trim().toLowerCase();
+
+  const supabase = await supabaseServer();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${appUrl()}/auth/callback?next=${encodeURIComponent("/dashboard/profile")}`,
+  });
+  if (error?.status === 429) return json({ ok: false, error: "Please wait a moment before requesting another code.", retryAfter: 60 }, 429);
+
+  if (error && isMailerFailure(error) && serviceRoleConfigured()) {
+    console.warn("[reset] Supabase could not send the recovery email:", error.message, "— using fallback");
+    const link = await supabaseAdmin().auth.admin.generateLink({ type: "recovery", email });
+    const code = link.data?.properties?.email_otp;
+    if (code) {
+      try {
+        await sendOtpEmail(email, code, "reset");
+      } catch (err) {
+        console.error("[reset] fallback email failed:", (err as Error).message);
+        if (isDev) return json({ ok: true, devCode: code });
+      }
+    }
+  }
+  // Always report success: never reveal whether an email is registered.
+  return json({ ok: true });
+}
+
+function friendly(message: string) {
+  if (/password/i.test(message)) return message;
+  if (/invalid.*email|email.*invalid/i.test(message)) return "Please enter a valid email address.";
+  return "We couldn't create your account right now. Please try again in a moment.";
 }

@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
-import { getRepository } from "@/lib/db";
+import { getRepository, repositoryName } from "@/lib/db";
 import { emailConfigured } from "@/lib/email";
 import { storageDriver } from "@/lib/storage";
+import { supabaseConfigured } from "@/lib/supabase/config";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-/** Setup check: is the database reachable, is email configured, where do uploads go? No secrets are returned. */
+/** Setup check: database, auth, email, storage. No secrets are returned. */
 export async function GET() {
   const repo = getRepository();
   const base = {
-    db: repo.driver,
-    email: emailConfigured() ? "configured" : "not configured",
+    db: repositoryName(),
+    auth: supabaseConfigured() ? "supabase" : "not configured",
     storage: storageDriver(),
+    email: emailConfigured() ? "smtp configured" : "supabase only",
     adminApi: process.env.ADMIN_API_TOKEN ? "enabled" : "disabled",
     appUrl: process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || null,
   };

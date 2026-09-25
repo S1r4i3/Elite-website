@@ -17,7 +17,7 @@ export async function storePortalFile(file: FormDataEntryValue | null, customerI
   }
   const id = randomUUID();
   const storageKey = `portal/${customerId}/${id}${ext}`;
-  await saveObject(storageKey, Buffer.from(await file.arrayBuffer()));
+  await saveObject(storageKey, Buffer.from(await file.arrayBuffer()), file.type || undefined);
   return {
     file: { id, storageKey, originalName: file.name.slice(0, 200), mimeType: file.type || "application/octet-stream", size: file.size },
   };

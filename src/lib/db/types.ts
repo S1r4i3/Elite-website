@@ -54,6 +54,9 @@ export type Customer = {
   emailVerifiedAt: string | null;
   lastLoginAt: string | null;
   createdAt: string;
+  /** Where the return is in the office workflow (set by the admin panel). */
+  workflowStage?: "unassigned" | "documents" | "preparation" | "review" | "filed" | null;
+  docStatus?: "pending" | "partial" | "received" | null;
 };
 export type NewCustomer = Pick<Customer, "firstName" | "lastName" | "email" | "phone"> &
   Partial<Pick<Customer, "dob" | "state" | "country" | "address" | "passwordHash">>;

@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Circle,
   FileCheck2,
+  FileDown,
   FileText,
   FolderOpen,
   Globe,
@@ -20,7 +21,7 @@ import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { cn, formatBytes } from "@/lib/utils";
-import { getCurrentCustomer } from "@/lib/current-customer";
+import { getCurrentCustomer, getCurrentUserId } from "@/lib/current-customer";
 import { getRepository, type PortalDocument } from "@/lib/db";
 import { documentTypeLabel } from "@/lib/portal";
 import { LogoutButton } from "../logout-button";
@@ -30,6 +31,7 @@ import { DocActions } from "@/components/dashboard/doc-actions";
 import { DraftCard } from "@/components/dashboard/draft-card";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { TimeZones } from "@/components/dashboard/time-zones";
+import { PortalLive } from "@/components/dashboard/portal-live";
 
 export const dynamic = "force-dynamic";
 
@@ -40,12 +42,16 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
   const slug = (await params).section?.[0] ?? "";
   const current = allDashboardSections.find((s) => s.slug === slug);
   if (!current || ((await params).section?.length ?? 0) > 1) notFound();
-  const customer = await getCurrentCustomer();
+  // Load the profile and the documents in parallel (both only need the user id).
+  const userId = await getCurrentUserId();
+  const [customer, all] = await Promise.all([
+    getCurrentCustomer(),
+    userId ? getRepository().listPortalDocuments(userId) : Promise.resolve([] as PortalDocument[]),
+  ]);
   // The cookie is valid but the account is gone (deleted, or a fresh database):
   // clear the session instead of bouncing between /dashboard and /login.
   if (!customer) redirect(`/api/auth/expired?next=/dashboard${slug ? `/${slug}` : ""}`);
 
-  const all = await getRepository().listPortalDocuments(customer.id);
   const uploads = all.filter((d) => d.kind === "upload");
   const drafts = all.filter((d) => d.kind === "draft");
   const finals = all.filter((d) => d.kind === "final");
@@ -163,19 +169,22 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
               <p className="mt-2 max-w-2xl text-muted">{current.description}</p>
             </div>
             <div className="flex flex-col items-start gap-3 sm:items-end">
-              <TimeZones className="justify-start sm:justify-end" />
+              <PortalLive />
               {slug === "" && (
                 <Button asChild className="btn-shine">
-                  <Link href="/dashboard/upload-documents">
-                    <UploadCloud aria-hidden /> Upload documents
-                  </Link>
+                  <a href="/downloads/Elite-B-Tax-Client-Questionnaire.doc" download>
+                    <FileDown aria-hidden /> Questionnaire (.doc)
+                  </a>
                 </Button>
               )}
             </div>
           </div>
 
+          {/* World clocks: dashboard home only, full width so every zone is readable. */}
+          {slug === "" && <TimeZones wide className="mt-6" />}
+
           <div className="mt-8">
-            {slug === "" && <Overview uploads={uploads} drafts={drafts} finals={finals} />}
+            {slug === "" && <Overview uploads={uploads} drafts={drafts} finals={finals} stage={customer.workflowStage ?? null} docStatus={customer.docStatus ?? null} />}
             {slug === "upload-documents" && (
               <UploadSection counts={uploads.reduce<Record<string, number>>((m, d) => ((m[d.category ?? "other"] = (m[d.category ?? "other"] ?? 0) + 1), m), {})} />
             )}
@@ -212,15 +221,34 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
 
 /* ───────── Sections ───────── */
 
-function Overview({ uploads, drafts, finals }: { uploads: PortalDocument[]; drafts: PortalDocument[]; finals: PortalDocument[] }) {
+const STAGE_ORDER = ["unassigned", "documents", "preparation", "review", "filed"] as const;
+
+function Overview({
+  uploads,
+  drafts,
+  finals,
+  stage,
+  docStatus,
+}: {
+  uploads: PortalDocument[];
+  drafts: PortalDocument[];
+  finals: PortalDocument[];
+  stage: string | null;
+  docStatus: string | null;
+}) {
   const pending = drafts.filter((d) => d.status === "awaiting_review").length;
   const approved = drafts.some((d) => d.status === "approved");
+  // Office workflow position (updated live from the admin panel as the return moves between our team).
+  const at = Math.max(0, STAGE_ORDER.indexOf((stage ?? "unassigned") as (typeof STAGE_ORDER)[number]));
+  const past = (s: (typeof STAGE_ORDER)[number]) => at > STAGE_ORDER.indexOf(s);
   const steps = [
     { label: "Account created", done: true },
     { label: "Documents uploaded", done: uploads.length > 0 },
-    { label: "Draft estimate ready", done: drafts.length > 0 },
-    { label: "Draft approved", done: approved },
-    { label: "Final documents", done: finals.length > 0 },
+    { label: "Documents received by our team", done: docStatus === "received" || past("documents") },
+    { label: "Tax return being prepared", done: past("preparation") || drafts.length > 0 },
+    { label: "Reviewed by a senior preparer", done: past("review") },
+    { label: "Draft approved by you", done: approved },
+    { label: "Return filed", done: stage === "filed" || finals.length > 0 },
   ];
   const doneCount = steps.filter((s) => s.done).length;
   const next = steps.find((s) => !s.done);

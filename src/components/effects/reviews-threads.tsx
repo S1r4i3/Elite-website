@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import { useNearViewport } from "./use-near-viewport";
 
 const WebThreads = dynamic(() => import("./web-threads"), { ssr: false });
 
@@ -10,6 +11,7 @@ export function ReviewsThreads() {
   const ref = useRef<HTMLDivElement>(null);
   const [section, setSection] = useState<HTMLElement | null>(null);
   const [reduce, setReduce] = useState(false);
+  const near = useNearViewport(ref);
 
   useEffect(() => {
     setSection(ref.current?.closest("section") ?? null);
@@ -18,7 +20,7 @@ export function ReviewsThreads() {
 
   return (
     <div ref={ref} className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[140%] w-screen -translate-x-1/2 -translate-y-1/2 [mask-image:linear-gradient(to_bottom,transparent,black_22%,black_78%,transparent),linear-gradient(to_right,transparent,black_12%,black_88%,transparent)] [mask-composite:intersect]" aria-hidden>
-      {section && (
+      {section && near && (
         <WebThreads
           color1="#C8102E"
           color2="#FF6B78"

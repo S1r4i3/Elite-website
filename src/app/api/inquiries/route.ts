@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getRepository } from "@/lib/db";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { onInquiryCreated } from "@/lib/notify";
+import { sendToFormspree } from "@/lib/formspree";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your name").max(80),
@@ -26,12 +27,27 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ ok: false, error: parsed.error.issues[0]?.message || "Please check your details." }, { status: 400 });
   const d = parsed.data;
   if (d.website) return NextResponse.json({ ok: true });
-  try {
-    const inquiry = await getRepository().createInquiry({ name: d.name, phone: d.phone, email: d.email.toLowerCase(), message: d.message || null, page: d.page || null });
-    void onInquiryCreated(inquiry);
-    return NextResponse.json({ ok: true }, { status: 201 });
-  } catch (err) {
-    console.error("[api/inquiries] failed", err);
+  // Save for the admin dashboard AND send to Formspree (email) at the same time.
+  // The visitor sees success if either one works; failures are logged.
+  const email = d.email.toLowerCase();
+  const [saved, forwarded] = await Promise.allSettled([
+    getRepository()
+      .createInquiry({ name: d.name, phone: d.phone, email, message: d.message || null, page: d.page || null })
+      .then((inquiry) => void onInquiryCreated(inquiry)),
+    sendToFormspree({
+      name: d.name,
+      phone: d.phone,
+      email,
+      message: d.message || "",
+      page: d.page || "",
+      _replyto: email,
+      _subject: `New website enquiry — ${d.name}`,
+    }),
+  ]);
+  if (saved.status === "rejected") console.error("[api/inquiries] database save failed", saved.reason);
+  if (forwarded.status === "rejected") console.error("[api/inquiries] Formspree failed", forwarded.reason);
+  if (saved.status === "rejected" && forwarded.status === "rejected") {
     return NextResponse.json({ ok: false, error: "We couldn't send your message. Please try again or call us." }, { status: 500 });
   }
+  return NextResponse.json({ ok: true }, { status: 201 });
 }
