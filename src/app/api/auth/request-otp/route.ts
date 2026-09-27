@@ -35,7 +35,13 @@ export async function POST(req: Request) {
   const mode = z.enum(["register", "reset"]).safeParse(body.mode);
   if (!mode.success) return json({ ok: false, error: "Invalid request." }, 400);
 
-  return mode.data === "register" ? register(body) : reset(body);
+  try {
+    return mode.data === "register" ? await register(body) : await reset(body);
+  } catch (err) {
+    // Never fail silently: log the cause and tell the visitor something useful.
+    console.error(`[request-otp:${mode.data}] unexpected error:`, err);
+    return json({ ok: false, error: "We couldn't reach our sign-up service. Please try again in a minute." }, 500);
+  }
 }
 
 /* ───────────────────────── register ───────────────────────── */
