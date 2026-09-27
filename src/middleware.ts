@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
   let res = NextResponse.next({ request: req });
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   // Customer area
   if (pathname.startsWith("/dashboard") || pathname === "/login" || pathname === "/register") {
