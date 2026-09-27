@@ -6,3 +6,7 @@ out
 .data
 *.tsbuildinfo
 next-env.d.ts
+
+.env.local.bak
+*.bak
+Claude outputs/
