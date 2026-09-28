@@ -10,7 +10,7 @@ import { servicesByCategory } from "@/lib/services";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Business Tax Services — LLC, Corporate Tax, Bookkeeping & Payroll",
+  title: "Business Tax Services — LLC, Corporate Tax & Payroll",
   description:
     "LLC formation, entity formation, corporate tax filing (1120, 1120-S, 1065), bookkeeping, payroll and business tax planning for small and growing companies.",
   path: "/business-services",

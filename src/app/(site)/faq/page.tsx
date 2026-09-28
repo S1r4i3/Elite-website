@@ -6,7 +6,7 @@ import { services } from "@/lib/services";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Tax FAQs — Filing, FBAR, FATCA, ITIN, IRS Notices & NRI Taxes",
+  title: "Tax FAQs — Filing, FBAR, FATCA, ITIN & NRI Taxes",
   description: "Answers to common questions about U.S. tax filing, amendments, FBAR, FATCA, ITINs, IRS notices, LLCs, bookkeeping and Indian/NRI taxes.",
   path: "/faq",
 });

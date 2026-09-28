@@ -10,10 +10,15 @@ export function VerifiedToast() {
   const pathname = usePathname();
   const router = useRouter();
   const [show, setShow] = useState(false);
+  const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
     if (params.get("verified") !== "1") return;
     setShow(true);
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d: { customer?: { firstName?: string } | null }) => setName(d.customer?.firstName?.trim() || null))
+      .catch(() => {});
     router.replace(pathname, { scroll: false });
     const t = setTimeout(() => setShow(false), 7000);
     return () => clearTimeout(t);
@@ -24,8 +29,10 @@ export function VerifiedToast() {
     <div role="status" className="fixed inset-x-4 top-20 z-[60] mx-auto flex max-w-md animate-fade-up items-start gap-3 rounded-2xl border border-success-600/20 bg-white p-4 shadow-[var(--shadow-lift)] lg:top-24">
       <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success-600" aria-hidden />
       <div className="flex-1">
-        <p className="font-semibold text-navy-900">Email verified — welcome to Elite Tax!</p>
-        <p className="mt-0.5 text-sm text-muted">Your account is active and you're signed in.</p>
+        <p className="font-semibold text-navy-900">
+          {name ? `Welcome to Elite B Tax Services, ${name}!` : "Welcome to Elite B Tax Services!"}
+        </p>
+        <p className="mt-0.5 text-sm text-muted">Your email is verified, your account is active and you're signed in.</p>
       </div>
       <button type="button" onClick={() => setShow(false)} aria-label="Dismiss" className="text-subtle hover:text-navy-900">
         <X className="size-4" />

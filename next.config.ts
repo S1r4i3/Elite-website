@@ -5,7 +5,11 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
+
+/** Static media in /public never changes name, so browsers can keep it for 30 days. */
+const mediaCache = [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -19,7 +23,18 @@ const nextConfig: NextConfig = {
     return [{ source: "/refund-estimator", destination: "/get-started", permanent: true }];
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/videos/:path*", headers: mediaCache },
+      { source: "/brand/:path*", headers: mediaCache },
+      { source: "/downloads/:path*", headers: mediaCache },
+      // Temporary *.vercel.app addresses must not compete with the real domain in Google.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "(?<sub>.*)\\.vercel\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
   },
 };
 

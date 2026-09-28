@@ -107,7 +107,7 @@ export const services: Service[] = [
     name: "State Tax Filing",
     icon: "MapPin",
     summary: "State-specific filing for residents, part-year residents and multi-state earners.",
-    metaTitle: "State Tax Filing Services — Resident, Part-Year & Multi-State",
+    metaTitle: "State Tax Filing — Resident, Part-Year & Multi-State",
     metaDescription:
       "State income tax return preparation for residents, part-year residents and multi-state filers. Moved or worked in more than one state? Elite Tax Services can help.",
     keywords: ["state tax filing", "multi-state tax return", "part-year resident tax", "state income tax preparation"],
@@ -174,7 +174,7 @@ export const services: Service[] = [
     summary: "FinCEN Form 114 reporting for foreign bank and financial accounts.",
     metaTitle: "FBAR Filing Services (FinCEN Form 114)",
     metaDescription:
-      "Need to report foreign bank accounts? Elite Tax Services prepares and files FBAR (FinCEN Form 114) for U.S. persons with foreign accounts, including NRIs with Indian accounts.",
+      "FBAR (FinCEN Form 114) preparation and filing for U.S. persons with foreign bank accounts, including NRIs with Indian accounts. Accurate, on time, stress-free.",
     keywords: ["FBAR filing", "FinCEN 114", "foreign bank account report", "FBAR for NRI", "report Indian bank account"],
     hero: {
       eyebrow: "International reporting",
@@ -240,7 +240,7 @@ export const services: Service[] = [
     summary: "Form 8938 reporting of specified foreign financial assets with your tax return.",
     metaTitle: "FATCA Reporting Services (Form 8938)",
     metaDescription:
-      "FATCA Form 8938 preparation for U.S. taxpayers with foreign financial assets. Elite Tax Services helps you determine whether you meet the thresholds and report correctly.",
+      "FATCA Form 8938 preparation for U.S. taxpayers with foreign financial assets. We check whether you meet the thresholds and help you report correctly.",
     keywords: ["FATCA filing", "Form 8938", "foreign asset reporting", "FATCA for NRI"],
     hero: {
       eyebrow: "International reporting",
@@ -496,7 +496,7 @@ export const services: Service[] = [
     summary: "LLC formation, EIN setup and ongoing LLC tax filings.",
     metaTitle: "LLC Formation & LLC Tax Services",
     metaDescription:
-      "Start and run your LLC with confidence. Elite Tax Services helps with LLC formation, EIN applications, tax classification and LLC tax filings, including foreign-owned LLCs.",
+      "LLC formation, EIN applications, tax classification and LLC tax filing — including foreign-owned LLCs (Form 5472). Start and run your LLC with confidence.",
     keywords: ["LLC tax services", "LLC formation", "Delaware LLC", "foreign-owned LLC Form 5472", "LLC S corp election"],
     hero: {
       eyebrow: "Limited liability companies",
@@ -812,7 +812,7 @@ export const services: Service[] = [
     summary: "Indian income tax filing for NRIs and residents, supported by our dedicated India team.",
     metaTitle: "Indian Tax Services in the USA — NRI Tax Filing",
     metaDescription:
-      "Indian income tax return filing for NRIs living in the USA and for residents of India, with U.S. FBAR/FATCA coordination. Elite Tax Services — U.S. + India tax support under one roof.",
+      "Indian income tax return filing for NRIs in the USA and residents of India, coordinated with your U.S. FBAR and FATCA filings. U.S. + India tax under one roof.",
     keywords: ["NRI tax services", "Indian tax services USA", "NRI income tax return", "India tax filing from USA", "DTAA India USA"],
     hero: {
       eyebrow: "U.S. + India",

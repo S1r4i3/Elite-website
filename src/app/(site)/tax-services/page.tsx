@@ -10,7 +10,7 @@ import { homeFaqs } from "@/lib/faqs";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Individual Tax Services — Federal, State, FBAR, FATCA, ITIN & IRS Help",
+  title: "Individual Tax Services — Federal, State, FBAR & ITIN",
   description:
     "U.S. tax preparation for individuals and families: federal and state filing, FBAR, FATCA, ITIN applications, amended returns, IRS notices and Indian/NRI tax services.",
   path: "/tax-services",

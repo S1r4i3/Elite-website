@@ -292,7 +292,7 @@ function RegisterPanel({ onLogin, onLock }: { onLogin: () => void; onLock: (v: b
           straight to the website.
         </p>
         <ol className="mx-auto mt-7 max-w-sm space-y-3 text-left text-sm text-muted">
-          {["Open the email from Elite Tax Services", "Click “Verify Email Address”", "You're signed in and back on the website"].map((t, i) => (
+          {["Open the email from Elite B Tax Services", "Click “Verify Email Address”", "You're signed in and back on the website"].map((t, i) => (
             <li key={t} className="flex items-center gap-3">
               <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-600 text-xs font-bold text-white">{i + 1}</span> {t}
             </li>

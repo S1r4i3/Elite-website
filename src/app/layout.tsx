@@ -13,7 +13,7 @@ const manrope = localFont({ src: "./fonts/manrope-var.woff2", variable: "--font-
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — U.S. Tax Preparation, Business & NRI Tax Services`,
+    default: `${site.name} — U.S., Business & NRI Tax Filing`,
     template: `%s | ${site.name}`,
   },
   description: site.description,

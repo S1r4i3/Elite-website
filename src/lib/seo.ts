@@ -15,13 +15,17 @@ export function pageMetadata({
   keywords?: string[];
 }): Metadata {
   const url = absoluteUrl(path);
+  // Google shows ~60 characters of a title. Add the brand only when the full title still fits.
+  const branded = `${title} | ${site.name}`;
+  const fullTitle = branded.length <= 60 ? branded : title;
+  const image = { url: absoluteUrl("/opengraph-image"), width: 1200, height: 630, alt: `${site.name} — ${site.tagline}` };
   return {
-    title,
+    title: { absolute: fullTitle },
     description,
     keywords,
     alternates: { canonical: url },
-    openGraph: { type: "website", url, title: `${title} | ${site.name}`, description, siteName: site.name, locale: "en_US" },
-    twitter: { card: "summary_large_image", title: `${title} | ${site.name}`, description },
+    openGraph: { type: "website", url, title: fullTitle, description, siteName: site.name, locale: "en_US", images: [image] },
+    twitter: { card: "summary_large_image", title: fullTitle, description, images: [image.url] },
   };
 }
 

@@ -8,7 +8,7 @@ import { site } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "About Elite Tax Services",
+  title: "About Us",
   description:
     "Elite Tax Services (EliteBridge Tech Inc) provides individual, business and U.S. + India tax services from Dover, Delaware — accessible, approachable and accountable.",
   path: "/about",
