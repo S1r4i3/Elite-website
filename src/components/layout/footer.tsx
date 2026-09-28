@@ -105,10 +105,18 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 text-[13px] text-white/50 md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} Elite B Tax Services. All rights reserved.</p>
           <p>
-            © Elite B Tax Services. All rights reserved.
+            Designed &amp; Developed by{" "}
+            <a
+              href="https://www.sriramkarneedi.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-white/80 underline-offset-4 transition hover:text-white hover:underline"
+            >
+              Sriram
+            </a>
           </p>
-          
         </div>
       </div>
     </footer>
