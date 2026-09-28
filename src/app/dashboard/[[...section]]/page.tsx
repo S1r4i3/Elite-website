@@ -221,7 +221,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ sect
 
 /* ───────── Sections ───────── */
 
-const STAGE_ORDER = ["unassigned", "documents", "preparation", "review", "filed"] as const;
+const STAGE_ORDER = ["unassigned", "documents", "preparation", "review", "client_review", "filing", "irs_pending", "accepted", "closed"] as const;
 
 function Overview({
   uploads,
@@ -239,16 +239,20 @@ function Overview({
   const pending = drafts.filter((d) => d.status === "awaiting_review").length;
   const approved = drafts.some((d) => d.status === "approved");
   // Office workflow position (updated live from the admin panel as the return moves between our team).
-  const at = Math.max(0, STAGE_ORDER.indexOf((stage ?? "unassigned") as (typeof STAGE_ORDER)[number]));
+  // Office workflow: DH → TP → Tax Review → your approval → e-file → IRS/State → final documents.
+  const current = (stage === "filed" ? "closed" : stage ?? "unassigned") as (typeof STAGE_ORDER)[number];
+  const at = Math.max(0, STAGE_ORDER.indexOf(current));
   const past = (s: (typeof STAGE_ORDER)[number]) => at > STAGE_ORDER.indexOf(s);
   const steps = [
     { label: "Account created", done: true },
     { label: "Documents uploaded", done: uploads.length > 0 },
     { label: "Documents received by our team", done: docStatus === "received" || past("documents") },
-    { label: "Tax return being prepared", done: past("preparation") || drafts.length > 0 },
-    { label: "Reviewed by a senior preparer", done: past("review") },
-    { label: "Draft approved by you", done: approved },
-    { label: "Return filed", done: stage === "filed" || finals.length > 0 },
+    { label: "Tax return prepared", done: past("preparation") },
+    { label: "Reviewed by a tax reviewer", done: past("review") },
+    { label: "Draft approved by you", done: past("client_review") || (approved && at >= STAGE_ORDER.indexOf("client_review")) },
+    { label: "Return e-filed", done: past("filing") },
+    { label: "Accepted by the IRS / state", done: past("irs_pending") },
+    { label: "Final documents delivered", done: current === "closed" || finals.length > 0 },
   ];
   const doneCount = steps.filter((s) => s.done).length;
   const next = steps.find((s) => !s.done);
