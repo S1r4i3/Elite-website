@@ -1,3 +1,4 @@
+import { appUrl } from "@/lib/app-url";
 import { NextResponse } from "next/server";
 import { getRepository, repositoryName } from "@/lib/db";
 import { emailConfigured } from "@/lib/email";
@@ -16,7 +17,7 @@ export async function GET() {
     storage: storageDriver(),
     email: emailConfigured() ? "smtp configured" : "supabase only",
     adminApi: process.env.ADMIN_API_TOKEN ? "enabled" : "disabled",
-    appUrl: process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || null,
+    appUrl: appUrl(),
   };
   try {
     await repo.stats();

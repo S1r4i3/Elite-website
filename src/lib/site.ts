@@ -4,6 +4,8 @@
  * Anything marked `verify` is published on the current website without a cited source —
  * confirm it with the business before launch, or set `show: false` to hide it site-wide.
  */
+import { SITE_URL } from "./site-url";
+
 export const site = {
   name: "Elite Tax Services",
   shortName: "Elite B Tax",
@@ -11,7 +13,7 @@ export const site = {
   mark: "/brand/ebt-mark.png",
   legalName: "EliteBridge Tech Inc",
   domain: "elitebtax.com",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitebtax.com",
+  url: SITE_URL,
   tagline: "Tax services without confusion.",
   description:
     "Elite Tax Services provides U.S. federal and state tax filing, FBAR and FATCA reporting, ITIN assistance, tax amendments, IRS notice support, business tax, LLC formation, bookkeeping, payroll and Indian/NRI tax services.",

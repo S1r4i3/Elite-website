@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { SITE_URL } from "./site-url";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,7 +16,7 @@ export function formatCurrency(value: number, opts: { cents?: boolean } = {}) {
 }
 
 export function absoluteUrl(path = "/") {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.elitebtax.com").replace(/\/$/, "");
+  const base = SITE_URL;
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
 

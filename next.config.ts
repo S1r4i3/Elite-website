@@ -20,7 +20,17 @@ const nextConfig: NextConfig = {
   experimental: { optimizePackageImports: ["lucide-react"] },
   serverExternalPackages: ["pg"],
   async redirects() {
-    return [{ source: "/refund-estimator", destination: "/get-started", permanent: true }];
+    return [
+      { source: "/refund-estimator", destination: "/get-started", permanent: true },
+      // The old Vercel address (and links in emails already sent) → the real domain.
+      // Only this production alias; preview deployments keep their own URLs.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "elite-website-eta.vercel.app" }],
+        destination: "https://elitebtax.com/:path*",
+        permanent: false,
+      },
+    ];
   },
   async headers() {
     return [
