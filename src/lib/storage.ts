@@ -2,7 +2,7 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { createHash, createHmac } from "node:crypto";
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { serviceRoleKey, supabaseAdmin } from "@/lib/supabase/admin";
 import { DOCUMENTS_BUCKET } from "@/lib/supabase/config";
 
 /**
@@ -18,9 +18,12 @@ import { DOCUMENTS_BUCKET } from "@/lib/supabase/config";
  * the authenticated routes in /api/me/* and /api/v1/admin/*.
  */
 
-const useSupabase = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+const useSupabase = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && serviceRoleKey());
 const useS3 = () => Boolean(process.env.S3_BUCKET);
 const root = () => path.resolve(process.cwd(), process.env.UPLOAD_DIR || ".data/uploads");
+
+/** True when files live in Supabase Storage — browsers can then upload straight to it (signed URLs). */
+export const supabaseStorageEnabled = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && serviceRoleKey());
 
 /** Which driver is active — handy for /api/health and the setup checklist. */
 export const storageDriver = () => (useSupabase() ? "supabase" : useS3() ? "s3" : "local");

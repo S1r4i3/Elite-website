@@ -15,7 +15,9 @@ export async function GET(req: Request) {
   const type = url.searchParams.get("type") as EmailOtpType | null;
   const code = url.searchParams.get("code");
   const nextParam = url.searchParams.get("next");
-  const next = nextParam && nextParam.startsWith("/") ? nextParam : "/?verified=1";
+  // New sign-ups land straight on their dashboard (older emails still carry "/?verified=1").
+  const wanted = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard?verified=1";
+  const next = wanted === "/?verified=1" ? "/dashboard?verified=1" : wanted;
 
   const supabase = await supabaseServer();
   let failed: string | null = null;

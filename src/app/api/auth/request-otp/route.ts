@@ -60,7 +60,7 @@ async function register(body: unknown) {
     country: d.country,
     address: d.address,
   };
-  const next = "/?verified=1";
+  const next = "/dashboard?verified=1";
 
   const supabase = await supabaseServer();
   const { data, error } = await supabase.auth.signUp({

@@ -28,7 +28,51 @@ type Props = {
   onUploaded?: (id: string) => void;
 };
 
-function uploadFile(file: File, category: string, onProgress: (p: number) => void, endpoint = "/api/uploads", extra: Record<string, string> = {}) {
+/** PUT a file to a Supabase signed upload URL, with progress. */
+function putToStorage(url: string, file: File, onProgress: (p: number) => void) {
+  return new Promise<void>((resolve, reject) => {
+    const body = new FormData();
+    body.append("cacheControl", "3600");
+    body.append("", file);
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", url);
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.min(99, Math.round((e.loaded / e.total) * 100)));
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Upload failed — please try again")));
+    xhr.onerror = () => reject(new Error("Network error — check your connection"));
+    xhr.send(body);
+  });
+}
+
+/**
+ * Client portal uploads go straight to storage (works for files up to 15 MB on Vercel, whose
+ * functions reject bodies over ~4.5 MB). Falls back to the classic upload when that isn't available.
+ */
+async function uploadFile(file: File, category: string, onProgress: (p: number) => void, endpoint = "/api/uploads", extra: Record<string, string> = {}) {
+  if (endpoint === "/api/me/documents") {
+    const sign = await fetch("/api/me/documents/sign", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: file.name, size: file.size }),
+    });
+    const s = await sign.json().catch(() => ({}));
+    if (sign.ok && s.ok) {
+      await putToStorage(s.signedUrl, file, onProgress);
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ key: s.key, name: file.name, category, ...extra }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) throw new Error(json.error || "Upload failed");
+      return { id: String(json.id) };
+    }
+    if (sign.status !== 501) throw new Error(s.error || "Upload failed");
+  }
+  return uploadViaApi(file, category, onProgress, endpoint, extra);
+}
+
+function uploadViaApi(file: File, category: string, onProgress: (p: number) => void, endpoint = "/api/uploads", extra: Record<string, string> = {}) {
   return new Promise<{ id: string }>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const body = new FormData();

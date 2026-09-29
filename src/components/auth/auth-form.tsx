@@ -251,7 +251,7 @@ function RegisterPanel({ onLogin, onLock }: { onLogin: () => void; onLock: (v: b
       const me = await fetch("/api/auth/me", { cache: "no-store" }).then((r) => r.json()).catch(() => null);
       if (me?.customer) {
         clearInterval(t);
-        router.replace("/?verified=1");
+        router.replace("/dashboard?verified=1");
         router.refresh();
       }
     }, 4000);
