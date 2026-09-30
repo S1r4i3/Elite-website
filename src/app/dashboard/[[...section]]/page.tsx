@@ -239,7 +239,7 @@ function Overview({
   const pending = drafts.filter((d) => d.status === "awaiting_review").length;
   const approved = drafts.some((d) => d.status === "approved");
   // Office workflow position (updated live from the admin panel as the return moves between our team).
-  // Office workflow: DH → TP → Tax Review → your approval → e-file → final documents.
+  // Office workflow: DH → TP → Tax Review → your approval → e-file → final documents (8 client steps).
   const current = (stage === "filed" ? "closed" : stage === "irs_pending" ? "accepted" : stage ?? "unassigned") as (typeof STAGE_ORDER)[number];
   const at = Math.max(0, STAGE_ORDER.indexOf(current));
   const past = (s: (typeof STAGE_ORDER)[number]) => at > STAGE_ORDER.indexOf(s);
@@ -250,7 +250,9 @@ function Overview({
     { label: "Tax return prepared", done: past("preparation") },
     { label: "Reviewed by a tax reviewer", done: past("review") },
     { label: "Draft approved by you", done: past("client_review") || (approved && at >= STAGE_ORDER.indexOf("client_review")) },
-    { label: "Final documents delivered", done: current === "closed" || finals.length > 0 },
+    { label: "Return e-filed successfully", done: past("filing") },
+    // Final documents count only once the return is e-filed (a file shared earlier isn't the final set).
+    { label: "Final documents delivered", done: current === "closed" || (past("filing") && finals.length > 0) },
   ];
   const doneCount = steps.filter((s) => s.done).length;
   const next = steps.find((s) => !s.done);
