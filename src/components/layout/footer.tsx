@@ -31,6 +31,7 @@ const cols = [
     links: [
       { label: "About", href: "/about" },
       { label: "How It Works", href: "/how-it-works" },
+      { label: "Tax Guides", href: "/guides" },
       { label: "Contact", href: "/contact" },
       { label: "FAQs", href: "/faq" },
       { label: "Reviews", href: "/reviews" },

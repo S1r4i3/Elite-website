@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { services } from "@/lib/services";
+import { guides } from "@/lib/guides";
 import { absoluteUrl } from "@/lib/utils";
 
 /**
@@ -20,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/about", priority: 0.7, changeFrequency: "monthly" },
     { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
     { path: "/reviews", priority: 0.6, changeFrequency: "weekly" },
+    { path: "/guides", priority: 0.8, changeFrequency: "weekly" },
   ];
 
   return [
@@ -29,6 +31,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.85,
+      images: [ogImage],
+    })),
+    ...guides.map((g) => ({
+      url: absoluteUrl(`/guides/${g.slug}`),
+      lastModified: new Date(`${g.updated}T12:00:00Z`),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
       images: [ogImage],
     })),
     ...["/privacy", "/terms"].map((p) => ({ url: absoluteUrl(p), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),

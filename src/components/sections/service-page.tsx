@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { guides } from "@/lib/guides";
 import { AlertTriangle, ArrowRight, Check, FileCheck2, UserCheck } from "lucide-react";
 import type { Service } from "@/lib/services";
 import { getService } from "@/lib/services";
@@ -49,6 +50,7 @@ function HeroAside({ service }: { service: Service }) {
 
 export function ServicePage({ service }: { service: Service }) {
   const related = service.related.map(getService).filter(Boolean) as Service[];
+  const reading = guides.filter((g) => g.services.includes(service.slug)).slice(0, 3);
   const crumbs = [categoryCrumb[service.category], { label: service.name, href: `/${service.slug}` }];
 
   return (
@@ -171,6 +173,24 @@ export function ServicePage({ service }: { service: Service }) {
         </div>
       </section>
 
+      {reading.length > 0 && (
+        <section className="section-y bg-canvas" aria-labelledby="guides-h">
+          <div className="container-x">
+            <h2 id="guides-h" className="text-2xl font-bold sm:text-3xl">
+              Helpful guides
+            </h2>
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
+              {reading.map((g) => (
+                <Link key={g.slug} href={`/guides/${g.slug}`} className="card card-hover p-6">
+                  <p className="eyebrow">{g.category}</p>
+                  <p className="mt-3 font-bold text-navy-900">{g.title}</p>
+                  <p className="mt-2 text-sm text-muted">{g.readMinutes} min read</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
       <FaqSection faqs={service.faqs} title={`${service.name} FAQs`} />
 
       {/* Lead form */}

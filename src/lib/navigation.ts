@@ -9,6 +9,7 @@ export const taxServiceLinks: NavLink[] = [
   { label: "ITIN Processing", href: "/itin", description: "", icon: "IdCard" },
   { label: "Tax Amendments", href: "/tax-amendment", description: "", icon: "FilePen" },
   { label: "IRS Representation", href: "/irs-representation", description: "Notices, letters & audit support", icon: "ShieldCheck" },
+  { label: "Tax Guides", href: "/guides", description: "FBAR, FATCA & NRI tax explained", icon: "BookOpen" },
 ];
 
 export const businessServiceLinks: NavLink[] = [
