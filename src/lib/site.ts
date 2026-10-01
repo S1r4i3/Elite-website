@@ -24,8 +24,8 @@ export const site = {
   },
   email: "support@elitebtax.com",
   whatsapp: {
-    number: "917989147148",
-    display: "+91 79891 47148",
+    number: "19453884422",
+    display: "+1 (945) 388-4422",
     message: "Hi Elite B Tax Services, I'd like help with my taxes.",
   },
   address: {
