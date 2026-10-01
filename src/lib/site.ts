@@ -18,14 +18,14 @@ export const site = {
   description:
     "Elite Tax Services provides U.S. federal and state tax filing, FBAR and FATCA reporting, ITIN assistance, tax amendments, IRS notice support, business tax, LLC formation, bookkeeping, payroll and Indian/NRI tax services.",
   phone: {
-    display: "+1 (945) 388-4422",
-    href: "tel:+19453884422",
-    e164: "+19453884422",
+    display: "+91 79891 47148",
+    href: "tel:+917989147148",
+    e164: "+917989147148",
   },
   email: "support@elitebtax.com",
   whatsapp: {
-    number: "19453884422",
-    display: "+1 (945) 388-4422",
+    number: "917989147148",
+    display: "+91 79891 47148",
     message: "Hi Elite B Tax Services, I'd like help with my taxes.",
   },
   address: {
