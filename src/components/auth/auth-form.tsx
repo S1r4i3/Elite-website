@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { track } from "@/lib/analytics";
 import { forwardRef, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -275,6 +276,7 @@ function RegisterPanel({ onLogin, onLock }: { onLogin: () => void; onLock: (v: b
     setDetails(data);
     setCooldown(60);
     setResent(isResend);
+    if (!isResend) track("sign_up", { method: "email" });
     setStep("sent");
   };
 

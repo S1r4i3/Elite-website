@@ -12,7 +12,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Individual Tax Services — Federal, State, FBAR & ITIN",
   description:
-    "U.S. tax preparation for individuals and families: federal and state filing, FBAR, FATCA, ITIN applications, amended returns, IRS notices and Indian/NRI tax services.",
+    "Tax preparation for individuals and families: federal and state returns, FBAR, FATCA, ITIN, amended returns and IRS notice help — reviewed before filing.",
   path: "/tax-services",
   keywords: ["U.S. tax preparation", "federal tax filing", "state tax filing", "FBAR", "FATCA", "ITIN", "IRS representation"],
 });

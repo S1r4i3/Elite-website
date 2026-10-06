@@ -9,7 +9,7 @@ import { absoluteUrl } from "@/lib/utils";
 
 const title = "Tax Guides for NRIs, H-1B Workers & Small Businesses";
 const description =
-  "Plain-English guides on FBAR, FATCA, Indian bank accounts, ITIN and U.S. tax filing — written by the Elite B Tax Services team for people living between the U.S. and India.";
+  "Plain-English guides on FBAR, FATCA, ITIN, Indian bank accounts, amended returns and business tax — sourced from the IRS and updated regularly.";
 
 export const metadata = pageMetadata({ title, description, path: "/guides", keywords: ["tax guides", "NRI tax guide", "FBAR guide", "FATCA guide", "US tax for Indians"] });
 
@@ -36,6 +36,17 @@ export default function GuidesPage() {
         crumbs={[{ label: "Guides", href: "/guides" }]}
       />
       <section className="section-y">
+        <p className="container-x mb-8 text-[15px] text-muted">
+          Looking for dates? See the{" "}
+          <Link href="/tax-deadlines" className="font-semibold text-brand-600 hover:underline">
+            U.S. and India tax deadlines for 2026–2027
+          </Link>
+          . Every guide links to its official sources —{" "}
+          <Link href="/disclaimer" className="font-semibold text-brand-600 hover:underline">
+            how we write and update them
+          </Link>
+          .
+        </p>
         <div className="container-x grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {list.map((g) => (
             <Link key={g.slug} href={`/guides/${g.slug}`} className="card card-hover group flex flex-col p-6">

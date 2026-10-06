@@ -40,7 +40,7 @@ export const services: Service[] = [
     summary: "Professional preparation and e-filing of your federal individual income tax return.",
     metaTitle: "Federal Tax Filing & Preparation Services",
     metaDescription:
-      "Professional federal income tax preparation and e-filing for W-2 employees, 1099 contractors, H-1B and visa holders, and families. Get started with Elite B Tax Services.",
+      "Federal income tax preparation and e-filing for W-2 employees, 1099 contractors, H-1B and visa holders, and families — reviewed with you before filing.",
     keywords: ["federal tax filing", "U.S. tax preparation", "1040 tax preparer", "1040-NR", "tax filing for H-1B"],
     hero: {
       eyebrow: "Individual tax preparation",
@@ -109,7 +109,7 @@ export const services: Service[] = [
     summary: "State-specific filing for residents, part-year residents and multi-state earners.",
     metaTitle: "State Tax Filing — Resident, Part-Year & Multi-State",
     metaDescription:
-      "State income tax return preparation for residents, part-year residents and multi-state filers. Moved or worked in more than one state? Elite B Tax Services can help.",
+      "State income tax returns for residents, part-year residents and multi-state filers. Moved or worked in more than one state? We file each state correctly.",
     keywords: ["state tax filing", "multi-state tax return", "part-year resident tax", "state income tax preparation"],
     hero: {
       eyebrow: "State returns",
@@ -304,7 +304,7 @@ export const services: Service[] = [
     summary: "Guidance and preparation for Form W-7 ITIN applications and renewals.",
     metaTitle: "ITIN Application & Renewal Services (Form W-7)",
     metaDescription:
-      "Need an ITIN for yourself, your spouse or dependents? Elite B Tax Services helps prepare Form W-7 applications and renewals and explains what documents you need.",
+      "Need an ITIN for yourself, your spouse or dependents? We prepare Form W-7 applications and renewals with your return and explain the documents needed.",
     keywords: ["ITIN application", "Form W-7", "ITIN for spouse", "ITIN for dependents", "ITIN renewal"],
     hero: {
       eyebrow: "ITIN services",
@@ -368,7 +368,7 @@ export const services: Service[] = [
     summary: "Correct errors or missed items on a previously filed return with Form 1040-X.",
     metaTitle: "Tax Amendment Services — File an Amended Return (1040-X)",
     metaDescription:
-      "Made a mistake on a filed tax return? Elite B Tax Services prepares amended federal (1040-X) and state returns to correct errors, add missed income or claim credits.",
+      "Made a mistake on a filed return? We prepare amended federal (Form 1040-X) and state returns to fix errors, add missed income or claim credits.",
     keywords: ["amend tax return", "1040-X", "amended tax return help", "correct tax return"],
     hero: {
       eyebrow: "Amended returns",
@@ -561,7 +561,7 @@ export const services: Service[] = [
     summary: "Choose and set up the right business structure for your goals.",
     metaTitle: "Business Entity Formation Services",
     metaDescription:
-      "LLC, S corporation, C corporation or partnership? Elite B Tax Services helps you choose the most suitable business structure and sets it up with the right tax elections.",
+      "LLC, S corporation, C corporation or partnership? We help you compare structures, form the entity, get an EIN and file the right tax elections.",
     keywords: ["entity formation", "business formation", "S corp vs LLC", "C corporation formation"],
     hero: {
       eyebrow: "Business structure",

@@ -99,7 +99,12 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   if (!g) notFound();
   const url = absoluteUrl(`/guides/${g.slug}`);
   const related = g.services.map((s) => getService(s)).filter((s): s is NonNullable<typeof s> => Boolean(s));
-  const more = guides.filter((x) => x.slug !== g.slug).slice(0, 3);
+  // Related guides first (shared services), then the rest — every guide gets links from its neighbours.
+  const shared = (x: (typeof guides)[number]) => x.services.filter((s) => g.services.includes(s)).length;
+  const more = guides
+    .filter((x) => x.slug !== g.slug)
+    .sort((a, b) => shared(b) - shared(a) || b.updated.localeCompare(a.updated))
+    .slice(0, 3);
 
   return (
     <>
@@ -176,7 +181,11 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
               </p>
               <p className="mt-2">
                 This guide is general information, not tax or legal advice for your situation. Rules and inflation-adjusted amounts change — contact us before
-                you file.
+                you file. Read our{" "}
+                <Link href="/disclaimer" className="underline underline-offset-2 hover:text-brand-600">
+                  disclaimer and editorial policy
+                </Link>
+                .
               </p>
             </div>
           </div>

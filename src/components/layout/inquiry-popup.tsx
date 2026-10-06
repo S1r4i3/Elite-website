@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { track } from "@/lib/analytics";
 import { usePathname } from "next/navigation";
 import { CheckCircle2, Loader2, Mail, MessageCircle, Phone, Send, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -74,6 +75,7 @@ export function InquiryPopup() {
     setBusy(false);
     if (!res || !res.ok) return setError(json.error || "Something went wrong. Please try again.");
     setSent(true);
+    track("contact_form_submit", { form: "inquiry", page: pathname });
     subscribed.current = true;
     try {
       localStorage.setItem(KEY, "sent");

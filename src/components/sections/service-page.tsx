@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { TrackView } from "@/components/seo/analytics";
 import { guides } from "@/lib/guides";
+import { serviceDetails } from "@/lib/service-details";
 import { AlertTriangle, ArrowRight, Check, FileCheck2, UserCheck } from "lucide-react";
 import type { Service } from "@/lib/services";
 import { getService } from "@/lib/services";
@@ -50,7 +52,13 @@ function HeroAside({ service }: { service: Service }) {
 
 export function ServicePage({ service }: { service: Service }) {
   const related = service.related.map(getService).filter(Boolean) as Service[];
-  const reading = guides.filter((g) => g.services.includes(service.slug)).slice(0, 3);
+  const detail = serviceDetails[service.slug];
+  const reading = [
+    ...(detail?.guideSlugs ?? []).map((s) => guides.find((g) => g.slug === s)).filter((g): g is (typeof guides)[number] => Boolean(g)),
+    ...guides.filter((g) => g.services.includes(service.slug)),
+  ]
+    .filter((g, i, all) => all.findIndex((x) => x.slug === g.slug) === i)
+    .slice(0, 3);
   const crumbs = [categoryCrumb[service.category], { label: service.name, href: `/${service.slug}` }];
 
   return (
@@ -156,6 +164,83 @@ export function ServicePage({ service }: { service: Service }) {
         </div>
       </section>
 
+      {detail && (
+        <section className="section-y bg-canvas" aria-labelledby="details-h">
+          <div className="container-x">
+            <SectionHeader
+              eyebrow="The details"
+              title={<span id="details-h">Forms, deadlines and common mistakes</span>}
+              subtitle={`What the ${service.name} process involves, so you know what to expect before you start.`}
+            />
+            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+              <div className="card p-6 sm:p-8">
+                <h3 className="text-xl font-bold">Forms involved</h3>
+                <dl className="mt-5 space-y-4">
+                  {detail.forms.map((f) => (
+                    <div key={f.form}>
+                      <dt className="font-semibold text-navy-900">{f.form}</dt>
+                      <dd className="mt-0.5 text-[15px] text-muted">{f.what}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              <div className="card p-6 sm:p-8">
+                <h3 className="text-xl font-bold">Key deadlines</h3>
+                <dl className="mt-5 space-y-4">
+                  {detail.deadlines.map((d) => (
+                    <div key={d.when + d.what}>
+                      <dt className="font-semibold text-navy-900">{d.when}</dt>
+                      <dd className="mt-0.5 text-[15px] text-muted">{d.what}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-5 text-[13px] text-muted">
+                  A due date on a weekend or legal holiday moves to the next business day. See all{" "}
+                  <Link href="/tax-deadlines" className="font-semibold text-brand-600 hover:underline">
+                    tax deadlines
+                  </Link>
+                  .
+                </p>
+              </div>
+              <div className="card p-6 sm:p-8">
+                <h3 className="text-xl font-bold">Common mistakes we fix</h3>
+                <ul className="mt-5 space-y-3">
+                  {detail.mistakes.map((m) => (
+                    <li key={m} className="flex items-start gap-3 text-[15px] text-ink">
+                      <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn-700" aria-hidden /> {m}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+              <div className="rounded-2xl border border-line bg-white p-6">
+                <h3 className="text-lg font-bold">Pricing</h3>
+                <p className="mt-2 text-[15px] text-muted">
+                  Fees depend on how complex your situation is — for example the number of forms, states, accounts or years involved. You get a
+                  quote before any work begins, and there is no charge for the first conversation.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-line bg-white p-6">
+                <h3 className="text-lg font-bold">Official sources</h3>
+                <ul className="mt-2 space-y-1.5 text-[15px]">
+                  {detail.sources.map((src) => (
+                    <li key={src.url}>
+                      <a href={src.url} target="_blank" rel="noopener" className="text-brand-600 underline-offset-2 hover:underline">
+                        {src.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-[13px] text-muted">
+                  General information, not advice for your situation. <Link href="/disclaimer" className="underline">Read our disclaimer</Link>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Trust */}
       <section className="border-y border-line bg-canvas py-12">
         <div className="container-x flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
@@ -174,7 +259,7 @@ export function ServicePage({ service }: { service: Service }) {
       </section>
 
       {reading.length > 0 && (
-        <section className="section-y bg-canvas" aria-labelledby="guides-h">
+        <section className="section-y" aria-labelledby="guides-h">
           <div className="container-x">
             <h2 id="guides-h" className="text-2xl font-bold sm:text-3xl">
               Helpful guides
@@ -224,6 +309,7 @@ export function ServicePage({ service }: { service: Service }) {
       )}
 
       <FinalCta />
+      <TrackView event="service_page_view" params={{ service: service.slug }} />
       <JsonLd data={serviceSchema({ name: service.name, description: service.metaDescription, path: `/${service.slug}` })} />
     </>
   );

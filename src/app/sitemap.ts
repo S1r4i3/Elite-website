@@ -8,7 +8,8 @@ import { absoluteUrl } from "@/lib/utils";
  * Private areas (portal, admin, auth) are excluded here and in robots.ts.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  // Bump when site-wide content changes; guides use their own "updated" date.
+  const now = new Date("2026-10-07T12:00:00Z");
   const ogImage = absoluteUrl("/opengraph-image");
 
   const core: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
@@ -22,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
     { path: "/reviews", priority: 0.6, changeFrequency: "weekly" },
     { path: "/guides", priority: 0.8, changeFrequency: "weekly" },
+    { path: "/tax-deadlines", priority: 0.7, changeFrequency: "monthly" },
   ];
 
   return [
@@ -40,6 +42,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.75,
       images: [ogImage],
     })),
-    ...["/privacy", "/terms"].map((p) => ({ url: absoluteUrl(p), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),
+    ...["/privacy", "/terms", "/disclaimer"].map((p) => ({ url: absoluteUrl(p), lastModified: now, changeFrequency: "yearly" as const, priority: 0.2 })),
   ];
 }

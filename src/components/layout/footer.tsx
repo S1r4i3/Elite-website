@@ -24,6 +24,7 @@ const cols = [
       { label: "Entity Formation", href: "/entity-formation" },
       { label: "Corporate Tax", href: "/corporate-tax" },
       { label: "Bookkeeping", href: "/bookkeeping" },
+      { label: "Payroll", href: "/payroll" },
     ],
   },
   {
@@ -32,11 +33,13 @@ const cols = [
       { label: "About", href: "/about" },
       { label: "How It Works", href: "/how-it-works" },
       { label: "Tax Guides", href: "/guides" },
+      { label: "Tax Deadlines", href: "/tax-deadlines" },
       { label: "Contact", href: "/contact" },
       { label: "FAQs", href: "/faq" },
       { label: "Reviews", href: "/reviews" },
-      { label: "Privacy Policy", href: "" },
-      { label: "Terms & Conditions", href: "" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms & Conditions", href: "/terms" },
+      { label: "Disclaimer", href: "/disclaimer" },
     ],
   },
 ];
@@ -78,10 +81,10 @@ export function Footer() {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={name}
                       className="grid size-10 place-items-center rounded-full border border-white/15 text-sm font-bold text-white transition hover:border-white/40 hover:bg-white/5"
                     >
-                      {socialGlyph[name]}
+                      <span aria-hidden>{socialGlyph[name]}</span>
+                      <span className="sr-only">{`${site.name} on ${name === "linkedin" ? "LinkedIn" : name === "twitter" ? "X (Twitter)" : "Facebook"}`}</span>
                     </a>
                   </li>
                 ))}

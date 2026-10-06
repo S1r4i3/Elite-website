@@ -4,9 +4,7 @@ import { MobileCta } from "@/components/layout/mobile-cta";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { Suspense } from "react";
 import { VerifiedToast } from "@/components/auth/verified-toast";
-import { MotionEffects } from "@/components/effects/motion-effects";
-import { CustomCursor } from "@/components/effects/custom-cursor";
-import { InquiryPopup } from "@/components/layout/inquiry-popup";
+import { DeferredExtras } from "@/components/effects/deferred-extras";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,9 +17,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Footer />
       <MobileCta />
       <WhatsAppButton />
-      <MotionEffects />
-      <CustomCursor />
-      <InquiryPopup />
+      <DeferredExtras />
     </>
   );
 }

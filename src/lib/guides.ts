@@ -45,7 +45,7 @@ export const guides: Guide[] = [
     title: "FBAR for Indians in the USA: Who Must File, Deadline and Penalties",
     seoTitle: "FBAR for Indians in the USA: Who Files & Deadline",
     description:
-      "Living in the US with bank accounts in India? Learn who must file FBAR (FinCEN 114), the $10,000 rule, the deadline, which Indian accounts count and how to fix missed years.",
+      "Living in the US with bank accounts in India? Who must file FBAR (FinCEN 114), the $10,000 rule, deadlines, which accounts count and fixing missed years.",
     keywords: ["FBAR for Indians", "FBAR NRI", "FinCEN 114", "FBAR filing India bank account", "FBAR deadline", "FBAR penalty"],
     category: "FBAR & FATCA",
     published: "2026-10-01",
@@ -152,7 +152,7 @@ export const guides: Guide[] = [
     title: "Do You Need to Report Indian Bank Accounts and FDs to the IRS?",
     seoTitle: "Reporting Indian Bank Accounts & FDs to the IRS",
     description:
-      "NRO, NRE, fixed deposits, mutual funds: what U.S. residents must report to the IRS, which forms apply (FBAR, Form 8938) and how Indian interest is taxed in the US.",
+      "NRO, NRE, fixed deposits, mutual funds: what U.S. residents must report to the IRS, which forms apply and how Indian interest is taxed in the US.",
     keywords: ["report Indian bank account to IRS", "NRE account US tax", "NRO account IRS", "Indian fixed deposit US tax", "Indian mutual funds PFIC"],
     category: "NRI & India tax",
     published: "2026-10-01",
@@ -226,7 +226,7 @@ export const guides: Guide[] = [
     title: "FBAR vs FATCA (Form 8938): What's the Difference?",
     seoTitle: "FBAR vs FATCA Form 8938: Key Differences",
     description:
-      "FBAR (FinCEN 114) and FATCA Form 8938 both report foreign assets but have different thresholds, deadlines and penalties. See a side-by-side comparison and who must file both.",
+      "FBAR (FinCEN 114) and Form 8938 both report foreign assets but have different thresholds, deadlines and penalties. A side-by-side comparison.",
     keywords: ["FBAR vs FATCA", "Form 8938 vs FBAR", "Form 8938 threshold", "FATCA reporting individuals", "FinCEN 114 vs 8938"],
     category: "FBAR & FATCA",
     published: "2026-10-01",
@@ -401,7 +401,7 @@ export const guides: Guide[] = [
     title: "H-1B, F-1, L-1: Are You a Resident or Nonresident for U.S. Tax?",
     seoTitle: "H-1B Tax: Resident or Nonresident Alien?",
     description:
-      "Your visa doesn't decide your tax status — the substantial presence test does. See how H-1B, L-1 and F-1 holders count days, which form to file and common mistakes.",
+      "Your visa doesn't decide your tax status — the substantial presence test does. How H-1B, L-1 and F-1 holders count days and which form to file.",
     keywords: ["H1B tax resident", "substantial presence test", "resident alien vs nonresident alien", "F1 student tax", "1040 vs 1040-NR", "H1B tax filing"],
     category: "NRI & India tax",
     published: "2026-10-07",
@@ -471,6 +471,236 @@ export const guides: Guide[] = [
     sources: [
       { label: "IRS — Substantial presence test", url: "https://www.irs.gov/individuals/international-taxpayers/substantial-presence-test" },
       { label: "IRS — Publication 519, U.S. Tax Guide for Aliens", url: "https://www.irs.gov/publications/p519" },
+    ],
+  },
+  {
+    slug: "how-to-amend-a-tax-return",
+    title: "How to Amend a Tax Return (Form 1040-X): When, How and Time Limits",
+    seoTitle: "How to Amend a Tax Return: Form 1040-X Guide",
+    description:
+      "When to file Form 1040-X, when you don't need to, the 3-year refund window, e-filing rules and how to track an amended tax return.",
+    keywords: ["amend tax return", "Form 1040-X", "amended tax return", "how to amend a tax return", "amended return time limit"],
+    category: "Individual tax",
+    published: "2026-10-07",
+    updated: "2026-10-07",
+    readMinutes: 5,
+    summary:
+      "File Form 1040-X when something on your filed return changes your filing status, income, deductions, credits, dependents or tax. To claim a refund, you generally must amend within 3 years of filing the original return or 2 years of paying the tax, whichever is later. Returns for 2022 and later can be amended electronically.",
+    sections: [
+      {
+        h2: "When you should amend",
+        blocks: [
+          { type: "list", items: ["You left out income, such as a late 1099 or interest from an Indian account.", "You claimed the wrong filing status or the wrong number of dependents.", "You missed a credit or deduction you qualified for.", "You filed as a resident when you were a nonresident, or the other way round."] },
+        ],
+      },
+      {
+        h2: "When you don't need to",
+        blocks: [
+          { type: "p", text: "Don't amend for simple math errors — the IRS corrects them and tells you. If the IRS accepted your return but asks for a missing form or schedule, send what it asks for instead of a full amended return." },
+          { type: "note", text: "If you received an IRS notice about the same issue (for example a CP2000), reply to the notice rather than filing a 1040-X on your own." },
+        ],
+      },
+      {
+        h2: "How to file Form 1040-X",
+        blocks: [
+          { type: "steps", items: ["Get a copy of the return you are changing and the documents behind the change.", "Complete Form 1040-X: original amounts, the change, the corrected amounts, and a short explanation.", "Attach any forms or schedules that changed.", "E-file it with tax software for tax years 2022 and later; earlier years must be filed on paper.", "Amend your state return too if the change affects state tax."] },
+        ],
+      },
+      {
+        h2: "Time limits and tracking",
+        blocks: [
+          { type: "p", text: "To get a refund, the general rule is 3 years from the date you filed the original return, or 2 years from the date you paid the tax, whichever is later. If you owe more, file and pay as soon as possible to limit interest." },
+          { type: "p", text: "Amended returns take longer than original returns to process. Use the IRS \"Where's My Amended Return?\" tool to follow its status." },
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Can I e-file an amended return?", a: "Yes, for tax years 2022 and later, using tax software. Returns for 2021 and earlier must be amended on paper." },
+      { q: "Do I need to amend my state return too?", a: "Usually, if the federal change affects your state income. Each state has its own amended form and rules." },
+      { q: "Will amending trigger an audit?", a: "Amending to correct an error is the normal, expected way to fix a return. It does not by itself mean an audit." },
+      { q: "Can you amend a return someone else prepared?", a: "Yes. We review the original return and documents, then prepare and file the 1040-X and any state amendment." },
+    ],
+    services: ["tax-amendment", "federal-tax-filing"],
+    sources: [
+      { label: "IRS — File an amended return", url: "https://www.irs.gov/filing/file-an-amended-return" },
+      { label: "IRS — Instructions for Form 1040-X", url: "https://www.irs.gov/instructions/i1040x" },
+    ],
+  },
+
+  {
+    slug: "what-to-do-after-an-irs-notice",
+    title: "Got an IRS Notice? What to Do Next (CP2000 and Other Letters)",
+    seoTitle: "Got an IRS Notice or CP2000? What to Do Next",
+    description:
+      "How to check an IRS letter is real, what a CP2000 means, how to agree or disagree, and why replying by the date on the notice matters.",
+    keywords: ["IRS notice help", "CP2000", "IRS letter what to do", "respond to IRS notice", "IRS notice help NRI"],
+    category: "Individual tax",
+    published: "2026-10-07",
+    updated: "2026-10-07",
+    readMinutes: 5,
+    summary:
+      "Read the whole notice, check that it is genuine, and act by the date it gives. If you agree, do what it asks — you usually don't need to reply unless the notice says so. If you disagree, reply with your explanation and documents before the due date. A CP2000 is not a bill: it proposes changes because third-party information didn't match your return.",
+    sections: [
+      {
+        h2: "First, make sure it's real",
+        blocks: [
+          { type: "p", text: "The IRS starts contact by mail. Search for the notice number on IRS.gov. If it doesn't show up or looks suspicious, call the IRS at 800-829-1040 — not a number printed on the letter." },
+          { type: "note", text: "The IRS does not start contact by text message, email or social media to ask for payment or personal information." },
+        ],
+      },
+      {
+        h2: "Common notices and what they mean",
+        blocks: [
+          {
+            type: "table",
+            head: ["Notice", "What it usually means", "What to do"],
+            rows: [
+              ["CP2000", "Income or payments reported by employers or banks don't match your return; the IRS proposes changes", "Reply by the date, agreeing or disagreeing with documents"],
+              ["Balance-due notice", "The IRS says you owe tax, penalties or interest", "Pay by the due date if you agree, or contact the IRS if you don't"],
+              ["Identity verification letter", "The IRS needs to confirm a return was filed by you", "Follow the instructions before the return can be processed"],
+            ],
+          },
+        ],
+      },
+      {
+        h2: "If you agree",
+        blocks: [
+          { type: "p", text: "Take the action requested. If you owe and can't pay in full, still pay what you can by the due date to reduce interest and penalties, and ask about a payment plan." },
+        ],
+      },
+      {
+        h2: "If you disagree",
+        blocks: [
+          { type: "steps", items: ["Read exactly which item the IRS changed.", "Gather proof: corrected forms, cost basis for sold shares, foreign tax paid, proof of residency status.", "Reply by the date on the notice, using the response form if one is included.", "Upload, fax or mail the reply as the notice instructs, and keep copies."] },
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Is a CP2000 a bill?", a: "No. It proposes changes to your return based on information the IRS received. If you don't respond, it can become a bill." },
+      { q: "Should I amend my return after a CP2000?", a: "Usually no — respond to the notice itself. Filing a separate 1040-X can complicate the case." },
+      { q: "Can someone talk to the IRS for me?", a: "Yes, with Form 2848 (power of attorney) for an authorized representative, or Form 8821 for someone to receive your tax information." },
+      { q: "Can you help me respond?", a: "Yes. We review the notice and your return, explain what changed, and prepare the response with supporting documents." },
+    ],
+    services: ["irs-representation", "tax-amendment"],
+    sources: [
+      { label: "IRS — Understanding your IRS notice or letter", url: "https://www.irs.gov/individuals/understanding-your-irs-notice-or-letter" },
+      { label: "IRS — Understanding your CP2000 notice", url: "https://www.irs.gov/individuals/understanding-your-cp2000-series-notice" },
+    ],
+  },
+
+  {
+    slug: "llc-tax-filing-explained",
+    title: "LLC Tax Filing Explained: Single-Member, Multi-Member and S Corp",
+    seoTitle: "LLC Tax Filing Explained: Forms & Deadlines",
+    description:
+      "Which tax form a single-member, multi-member or S corp LLC files, the deadlines, and when an S corporation election may make sense.",
+    keywords: ["LLC tax filing", "how is an LLC taxed", "single member LLC tax", "multi member LLC Form 1065", "LLC S corp election"],
+    category: "Business tax",
+    published: "2026-10-07",
+    updated: "2026-10-07",
+    readMinutes: 6,
+    summary:
+      "The IRS has no separate LLC tax return. By default a single-member LLC is disregarded — its income goes on the owner's return (Schedule C for a business run by an individual) — and an LLC with two or more members is taxed as a partnership on Form 1065. An LLC can instead elect to be taxed as a corporation (Form 8832) or an S corporation (Form 2553).",
+    sections: [
+      {
+        h2: "How each type of LLC files",
+        blocks: [
+          {
+            type: "table",
+            head: ["LLC type", "Taxed as", "Federal return", "Due (calendar year)"],
+            rows: [
+              ["One member (individual)", "Disregarded entity", "Owner's Form 1040 with Schedule C (or E/F)", "April 15"],
+              ["Two or more members", "Partnership", "Form 1065 + K-1 for each member", "March 15"],
+              ["Elected S corporation", "S corporation", "Form 1120-S + K-1s", "March 15"],
+              ["Elected C corporation", "C corporation", "Form 1120", "April 15"],
+            ],
+          },
+          { type: "note", text: "Even a disregarded LLC is a separate entity for employment taxes: if it has employees, it handles payroll under its own EIN." },
+        ],
+      },
+      {
+        h2: "When an S corporation election can make sense",
+        blocks: [
+          { type: "p", text: "With an S election, owners who work in the business are paid a reasonable salary through payroll, and remaining profit passes through without self-employment tax. That can lower total tax once profit is high enough to cover the extra payroll and filing costs — it is not automatically better." },
+          { type: "p", text: "Form 2553 is generally due within 2 months and 15 days after the start of the tax year the election should take effect." },
+        ],
+      },
+      {
+        h2: "Deadlines and records",
+        blocks: [
+          { type: "list", items: ["March 15: partnership and S corporation returns, and K-1s to owners.", "April 15: single-member LLC income on the owner's return; C corporation returns.", "Form 7004 gives business returns an automatic 6-month extension to file.", "Keep a separate business bank account and monthly books — the return is only as good as the records."] },
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Does a single-member LLC file its own tax return?", a: "Not by default. Its income and expenses go on the owner's return. It may still need an EIN and payroll filings." },
+      { q: "What happens if a multi-member LLC files Form 1065 late?", a: "The IRS charges a penalty for each member for each month the return is late, so the March 15 date matters." },
+      { q: "Is an S corp always cheaper?", a: "No. It adds payroll and a separate return. It tends to help only when profit is comfortably above a reasonable salary." },
+      { q: "Can you handle our LLC's books and return?", a: "Yes. We can set up bookkeeping, run owner payroll if you elect S status, and prepare the return and K-1s." },
+    ],
+    services: ["llc-services", "corporate-tax", "entity-formation", "bookkeeping"],
+    sources: [
+      { label: "IRS — Limited liability company (LLC)", url: "https://www.irs.gov/businesses/small-businesses-self-employed/limited-liability-company-llc" },
+      { label: "IRS — Instructions for Form 2553", url: "https://www.irs.gov/instructions/i2553" },
+      { label: "IRS — Instructions for Form 1065", url: "https://www.irs.gov/instructions/i1065" },
+    ],
+  },
+
+  {
+    slug: "estimated-tax-payments",
+    title: "Estimated Tax Payments: Who Pays, Due Dates and How to Avoid Penalties",
+    seoTitle: "Estimated Tax Payments: Due Dates & Safe Harbor",
+    description:
+      "Who must pay quarterly estimated tax, the four due dates, the safe-harbor rules that avoid penalties, and how to pay the IRS.",
+    keywords: ["estimated tax payments", "quarterly estimated tax", "1040-ES", "estimated tax due dates", "underpayment penalty"],
+    category: "Individual tax",
+    published: "2026-10-07",
+    updated: "2026-10-07",
+    readMinutes: 5,
+    summary:
+      "If you expect to owe $1,000 or more when you file (individuals) or $500 or more (corporations), you generally need to pay estimated tax during the year. For individuals the usual due dates are April 15, June 15, September 15 and January 15. You usually avoid the underpayment penalty by paying at least 90% of this year's tax or 100% of last year's (110% if your AGI was over $150,000).",
+    sections: [
+      {
+        h2: "Who needs to pay",
+        blocks: [
+          { type: "list", items: ["Freelancers, 1099 contractors and sole proprietors with no withholding.", "Landlords, including those with rental income from India.", "Investors with large dividends or capital gains.", "Employees whose withholding doesn't cover other income — raising W-4 withholding is an alternative."] },
+        ],
+      },
+      {
+        h2: "Due dates for individuals",
+        blocks: [
+          {
+            type: "table",
+            head: ["Income earned", "Payment due"],
+            rows: [["January 1 – March 31", "April 15"], ["April 1 – May 31", "June 15"], ["June 1 – August 31", "September 15"], ["September 1 – December 31", "January 15 of the next year"]],
+          },
+          { type: "note", text: "A due date on a weekend or legal holiday moves to the next business day." },
+        ],
+      },
+      {
+        h2: "The safe-harbor rule",
+        blocks: [
+          { type: "p", text: "You generally won't owe an underpayment penalty if your payments and withholding cover the smaller of 90% of this year's tax or 100% of last year's tax. If your adjusted gross income last year was more than $150,000, the prior-year figure is 110%." },
+        ],
+      },
+      {
+        h2: "How to pay",
+        blocks: [
+          { type: "p", text: "Use Form 1040-ES to work out the amount, then pay online through your IRS account or IRS Direct Pay, by phone, through the IRS2Go app, or by mail with a voucher. Most states have their own estimated payments too." },
+        ],
+      },
+    ],
+    faqs: [
+      { q: "I'm on a W-2 with a side business. Do I need to pay estimates?", a: "Possibly. If withholding won't cover your total tax, either pay estimates or increase withholding on your W-4 — withholding is treated as paid evenly through the year." },
+      { q: "What if my income is uneven?", a: "The annualized income method (Form 2210, Schedule AI) can reduce or remove the penalty when most income came late in the year." },
+      { q: "Do corporations pay estimates too?", a: "Yes, generally when the corporation expects to owe $500 or more, using its own due dates." },
+      { q: "Can you calculate our quarterly payments?", a: "Yes. We estimate the year, set the payments and adjust them if your income changes." },
+    ],
+    services: ["federal-tax-filing", "llc-services", "corporate-tax"],
+    sources: [
+      { label: "IRS — Estimated taxes", url: "https://www.irs.gov/businesses/small-businesses-self-employed/estimated-taxes" },
+      { label: "IRS — Form 1040-ES", url: "https://www.irs.gov/forms-pubs/about-form-1040-es" },
+      { label: "IRS — Publication 505", url: "https://www.irs.gov/publications/p505" },
     ],
   },
 ];

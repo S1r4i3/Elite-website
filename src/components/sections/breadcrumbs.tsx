@@ -27,6 +27,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
         data={{
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
+          "@id": `${absoluteUrl(all[all.length - 1].href)}#breadcrumb`,
           itemListElement: all.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.label, item: absoluteUrl(c.href) })),
         }}
       />

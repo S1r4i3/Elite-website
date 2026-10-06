@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { track } from "@/lib/analytics";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,6 +91,7 @@ export function LeadForm({ defaultService, source, estimate, submitLabel = "Subm
         throw new Error(json.error || "Something went wrong. Please try again.");
       }
       setStatus("success");
+      track("generate_lead", { form: "lead", service: data.service, source: source ?? window.location.pathname });
       reset();
     } catch (e) {
       setServerError((e as Error).message);

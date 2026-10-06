@@ -126,16 +126,32 @@ export function privatePageMetadata({ title, description, path }: { title: strin
   };
 }
 
-export function serviceSchema(s: { name: string; description: string; path: string }) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: s.name,
-    description: s.description,
-    serviceType: s.name,
-    url: absoluteUrl(s.path),
-    provider: { "@id": absoluteUrl("/#organization") },
-    areaServed: [{ "@type": "Country", name: "United States" }, { "@type": "Country", name: "India" }],
-    isPartOf: { "@id": absoluteUrl("/#website") },
-  };
+export function serviceSchema(s: { name: string; description: string; path: string; serviceType?: string }) {
+  const url = absoluteUrl(s.path);
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": `${url}#webpage`,
+      url,
+      name: s.name,
+      description: s.description,
+      isPartOf: { "@id": absoluteUrl("/#website") },
+      about: { "@id": `${url}#service` },
+      breadcrumb: { "@id": `${url}#breadcrumb` },
+      inLanguage: "en-US",
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": `${url}#service`,
+      name: s.name,
+      description: s.description,
+      serviceType: s.serviceType ?? s.name,
+      url,
+      mainEntityOfPage: { "@id": `${url}#webpage` },
+      provider: { "@id": absoluteUrl("/#organization") },
+      areaServed: [{ "@type": "Country", name: "United States" }, { "@type": "Country", name: "India" }],
+    },
+  ];
 }

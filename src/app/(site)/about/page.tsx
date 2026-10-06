@@ -10,7 +10,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "About Us",
   description:
-    "Elite B Tax Services (EliteBridge Tech Inc) provides individual, business and U.S. + India tax services from Dover, Delaware — accessible, approachable and accountable.",
+    "Elite B Tax Services (EliteBridge Tech Inc) provides individual, business and U.S.–India tax services online, from Dover, Delaware.",
   path: "/about",
 });
 

@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { RevealObserver } from "@/components/layout/reveal";
 import { JsonLd } from "@/components/seo/json-ld";
+import { Analytics } from "@/components/seo/analytics";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -13,7 +14,7 @@ const manrope = localFont({ src: "./fonts/manrope-var.woff2", variable: "--font-
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — U.S., Business & NRI Tax Filing`,
+    default: `${site.name} | U.S. & India Tax Filing, FBAR, ITIN`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <RevealObserver />
+        <Analytics />
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
       </body>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LatestGuides } from "@/components/sections/latest-guides";
 import { Hero } from "@/components/sections/hero";
 import dynamic from "next/dynamic";
 import { ServicesGrid } from "@/components/sections/services-grid";
@@ -43,6 +44,7 @@ export default function HomePage() {
       <ServiceFinder />
       <WhyElite />
       <Reviews />
+      <LatestGuides />
       <FaqSection faqs={homeFaqs} subtitle="Quick answers to the questions we hear most." />
       <FinalCta />
     </>

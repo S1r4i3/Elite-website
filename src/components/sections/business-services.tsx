@@ -77,7 +77,7 @@ export function BusinessServices() {
           <SectionHeader
             dark
             align="left"
-            title={<span id="business-heading">Individual Business Tax Services</span>}
+            title={<span id="business-heading">Business Tax, Bookkeeping & Payroll Services</span>}
             subtitle="From forming your company and year-end returns — one team that understands both your books and your taxes."
           />
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">
