@@ -3,7 +3,7 @@ import { AuthShell } from "@/components/auth/auth-shell";
 
 export const metadata = privatePageMetadata({
   title: "Forgot password",
-  description: "Reset the password for your Elite Tax Services client portal account.",
+  description: "Reset the password for your Elite B Tax Services client portal account.",
   path: "/forgot-password",
 });
 

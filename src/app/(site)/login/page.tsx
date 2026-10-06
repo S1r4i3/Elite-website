@@ -3,7 +3,7 @@ import { AuthShell } from "@/components/auth/auth-shell";
 
 export const metadata = privatePageMetadata({
   title: "Log in",
-  description: "Sign in to your Elite Tax Services client portal to upload documents, review draft estimations and download your final return.",
+  description: "Sign in to your Elite B Tax Services client portal to upload documents, review draft estimations and download your final return.",
   path: "/login",
 });
 

@@ -7,8 +7,10 @@
 import { SITE_URL } from "./site-url";
 
 export const site = {
-  name: "Elite Tax Services",
+  name: "Elite B Tax Services",
   shortName: "Elite B Tax",
+  /** Other names people search for. */
+  alternateNames: ["Elite B Tax", "EliteBTax", "Elite Tax Services", "EBT Tax"],
   logo: "/brand/ebt-logo.png",
   mark: "/brand/ebt-mark.png",
   legalName: "EliteBridge Tech Inc",
@@ -16,7 +18,7 @@ export const site = {
   url: SITE_URL,
   tagline: "Tax services without confusion.",
   description:
-    "Elite Tax Services provides U.S. federal and state tax filing, FBAR and FATCA reporting, ITIN assistance, tax amendments, IRS notice support, business tax, LLC formation, bookkeeping, payroll and Indian/NRI tax services.",
+    "Elite B Tax Services provides U.S. federal and state tax filing, FBAR and FATCA reporting, ITIN assistance, tax amendments, IRS notice support, business tax, LLC formation, bookkeeping, payroll and Indian/NRI tax services.",
   phone: {
     display: "+1 (302) 202-2139",
     href: "tel:+13022022139",
@@ -41,7 +43,7 @@ export const site = {
   social: {
     facebook: "",
     twitter: "",
-    linkedin: "",
+    linkedin: "https://www.linkedin.com/company/elite-b-tax-services",
   } as Record<"facebook" | "twitter" | "linkedin", string>,
   /** Figures as published on elitebtax.com. */
   stats: {
@@ -49,7 +51,7 @@ export const site = {
     customers: { value: 22291, suffix: "+", label: "Customers served", verify: true },
     rating: { value: 4.9, suffix: "/5", label: "Customer rating", verify: true },
     years: { value: 10, suffix: "+", label: "Years of experience", verify: true },
-    sourceNote: "Figures as published by Elite Tax Services on elitebtax.com.",
+    sourceNote: "Figures as published by Elite B Tax Services on elitebtax.com.",
   },
   /** Credentials as described on elitebtax.com. */
   credentials: [

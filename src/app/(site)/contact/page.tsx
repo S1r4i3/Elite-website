@@ -5,7 +5,7 @@ import { site } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Contact Elite Tax Services — Talk to a Tax Professional",
+  title: "Contact Elite B Tax Services — Talk to a Tax Professional",
   description: `Call ${site.phone.display} or email ${site.email} to talk to a tax professional about U.S. or India tax filing. Office in Dover, Delaware.`,
   path: "/contact",
 });

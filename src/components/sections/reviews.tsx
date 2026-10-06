@@ -63,7 +63,7 @@ export function Reviews({ limit = 6, as = "h2" }: { limit?: number; as?: "h1" | 
                 <span className="text-xl text-muted">/5</span>
               </p>
             )}
-            {site.stats.show && <p className="mt-1 text-sm text-muted">Customer rating as published by Elite Tax Services</p>}
+            {site.stats.show && <p className="mt-1 text-sm text-muted">Customer rating as published by Elite B Tax Services</p>}
             <p className="mx-auto mt-5 max-w-md text-[15px] leading-relaxed text-muted">
               We&apos;re gathering verified reviews from our clients. Once published, each one will link to the platform it was posted on.
             </p>

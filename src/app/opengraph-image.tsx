@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-export const alt = "Elite B Tax — Elite Tax Services. Your Taxes. Done Right. Without the Stress.";
+export const alt = "Elite B Tax Services. Your Taxes. Done Right. Without the Stress.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

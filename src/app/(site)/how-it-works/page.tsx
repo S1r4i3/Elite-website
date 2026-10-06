@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "How It Works — Simple Online Tax Filing With a Professional",
-  description: "Tell us about yourself, upload documents securely, get a professional review and file. See how working with Elite Tax Services works.",
+  description: "Tell us about yourself, upload documents securely, get a professional review and file. See how working with Elite B Tax Services works.",
   path: "/how-it-works",
 });
 

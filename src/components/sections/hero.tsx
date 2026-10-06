@@ -18,14 +18,15 @@ export function Hero() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand-600/60 to-transparent" aria-hidden />
       <div className="container-x relative grid items-center gap-14 pb-16 pt-10 sm:pt-14 lg:grid-cols-12 lg:gap-10 lg:pb-24 lg:pt-20">
         <div className="lg:col-span-6" data-parallax="-0.08" suppressHydrationWarning>
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[13px] font-medium text-white/80 backdrop-blur">
+          {/* The H1 carries the search terms; the slogan below keeps the big visual line. */}
+          <h1 className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[13px] font-medium text-white/80 backdrop-blur">
             <span className="size-2 rounded-full bg-brand-500 shadow-[0_0_0_3px_rgb(227_25_47/0.25)]" aria-hidden />
-            Individual, business & U.S. + India tax services
-          </p>
-          <h1 className="mt-6 text-[40px] font-extrabold leading-[1.04] text-white sm:text-6xl lg:text-[64px]">
+            Elite B Tax Services — U.S. tax filing for individuals, NRIs & small businesses
+          </h1>
+          <p className="mt-6 font-display text-[40px] tracking-tight font-extrabold leading-[1.04] text-white sm:text-6xl lg:text-[64px]">
             Your Taxes. Done Right.{" "}
             <span className="text-shimmer">Without the Stress.</span>
-          </h1>
+          </p>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
             Professional tax preparation and business tax services designed to make filing simpler, clearer, and more convenient.
           </p>

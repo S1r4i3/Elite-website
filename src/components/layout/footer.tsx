@@ -91,7 +91,7 @@ export function Footer() {
           <div className="grid gap-10 sm:grid-cols-3 lg:col-span-8">
             {cols.map((col) => (
               <nav key={col.title} aria-label={col.title}>
-                <h2 className="font-sans text-sm font-semibold uppercase tracking-[0.12em] text-white">{col.title}</h2>
+                <p className="font-sans text-sm font-semibold uppercase tracking-[0.12em] text-white">{col.title}</p>
                 <ul className="mt-5 space-y-3 text-[15px]">
                   {col.links.map((l) => (
                     <li key={l.href + l.label}>

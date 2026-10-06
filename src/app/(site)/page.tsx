@@ -16,14 +16,14 @@ import { absoluteUrl } from "@/lib/utils";
 const ServiceFinder = dynamic(() => import("@/components/sections/service-finder").then((m) => m.ServiceFinder));
 
 const homeDescription =
-  "U.S. federal & state tax filing, FBAR, FATCA, ITIN, IRS notices, LLC & business tax, bookkeeping, payroll and NRI tax services — done right, without the stress.";
+  "Elite B Tax Services: U.S. federal & state tax filing, FBAR, FATCA, ITIN, IRS notices, business tax and NRI tax help. Online, secure, done right.";
 
 export const metadata: Metadata = {
   description: homeDescription,
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
     type: "website",
-    siteName: "Elite Tax Services",
+    siteName: "Elite B Tax Services",
     locale: "en_US",
     url: absoluteUrl("/"),
     description: homeDescription,

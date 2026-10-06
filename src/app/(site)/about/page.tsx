@@ -10,7 +10,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "About Us",
   description:
-    "Elite Tax Services (EliteBridge Tech Inc) provides individual, business and U.S. + India tax services from Dover, Delaware — accessible, approachable and accountable.",
+    "Elite B Tax Services (EliteBridge Tech Inc) provides individual, business and U.S. + India tax services from Dover, Delaware — accessible, approachable and accountable.",
   path: "/about",
 });
 
@@ -26,7 +26,7 @@ export default function AboutPage() {
       <PageHero
         eyebrow="About us"
         title="Tax services without confusion."
-        subtitle="Elite Tax Services helps individuals, families and businesses in the U.S. — and clients with ties to India — file accurately and understand their taxes."
+        subtitle="Elite B Tax Services helps individuals, families and businesses in the U.S. — and clients with ties to India — file accurately and understand their taxes."
         crumbs={[{ label: "About", href: "/about" }]}
       />
       <section className="section-y">

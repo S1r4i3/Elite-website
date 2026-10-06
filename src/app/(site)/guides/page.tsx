@@ -9,7 +9,7 @@ import { absoluteUrl } from "@/lib/utils";
 
 const title = "Tax Guides for NRIs, H-1B Workers & Small Businesses";
 const description =
-  "Plain-English guides on FBAR, FATCA, Indian bank accounts, ITIN and U.S. tax filing — written by the Elite Tax Services team for people living between the U.S. and India.";
+  "Plain-English guides on FBAR, FATCA, Indian bank accounts, ITIN and U.S. tax filing — written by the Elite B Tax Services team for people living between the U.S. and India.";
 
 export const metadata = pageMetadata({ title, description, path: "/guides", keywords: ["tax guides", "NRI tax guide", "FBAR guide", "FATCA guide", "US tax for Indians"] });
 

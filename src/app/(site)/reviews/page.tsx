@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Client Reviews",
-  description: "Verified reviews from Elite Tax Services clients for tax preparation, FBAR/FATCA, ITIN, business and NRI tax services.",
+  description: "Verified reviews from Elite B Tax Services clients for tax preparation, FBAR/FATCA, ITIN, business and NRI tax services.",
   path: "/reviews",
 });
 
