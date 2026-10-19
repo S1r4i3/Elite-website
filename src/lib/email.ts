@@ -15,12 +15,24 @@ function getTransporter() {
     port,
     secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465,
     auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
+    connectionTimeout: 4000,
+    greetingTimeout: 4000,
+    socketTimeout: 6000,
   });
   return transporter;
 }
 
-/** True when SMTP is set up (a host, plus a password whenever a username is given). */
-export const emailConfigured = () => Boolean(process.env.SMTP_HOST && (!process.env.SMTP_USER || process.env.SMTP_PASS));
+/** True when SMTP is set up with real credentials (ignores placeholder keys). */
+export const emailConfigured = () => {
+  const host = process.env.SMTP_HOST?.trim();
+  const user = process.env.SMTP_USER?.trim();
+  const pass = process.env.SMTP_PASS?.trim();
+  if (!host) return false;
+  if (user && (!pass || pass.includes("PASTE_YOUR") || pass.startsWith("re_PASTE") || pass.startsWith("your-"))) {
+    return false;
+  }
+  return Boolean(user ? pass : true);
+};
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 

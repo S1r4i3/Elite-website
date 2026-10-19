@@ -152,23 +152,27 @@ function LoginPanel({ onRegister }: { onRegister: () => void }) {
   });
   const errors = formState.errors;
 
+  useEffect(() => {
+    const next = params.get("next");
+    router.prefetch(next && next.startsWith("/dashboard") ? next : "/dashboard");
+  }, [router, params]);
+
   const submit = handleSubmit(async (data) => {
     setLoading(true);
     setError(null);
     setNeedsReset(false);
     const { ok, json } = await postJson("/api/auth/login", data);
-    setLoading(false);
     if (!ok) {
+      setLoading(false);
       setError(json.error || "Login failed.");
       setNeedsReset(json.code === "NO_PASSWORD");
       return;
     }
     setDone(true);
     const next = params.get("next");
-    setTimeout(() => {
-      router.replace(next && next.startsWith("/dashboard") ? next : "/dashboard");
-      router.refresh();
-    }, 700);
+    const dest = next && next.startsWith("/dashboard") ? next : "/dashboard";
+    // Navigate immediately with fresh session
+    window.location.assign(dest);
   });
 
   if (done) return <Done title="Welcome back!" body="Taking you to your dashboard…" />;
@@ -209,7 +213,15 @@ function LoginPanel({ onRegister }: { onRegister: () => void }) {
           </Alert>
         )}
         <Button type="submit" size="lg" className="btn-shine w-full" disabled={loading}>
-          {loading ? <Loader2 className="animate-spin" aria-hidden /> : <Lock aria-hidden />} Log in
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin" aria-hidden /> Signing in…
+            </>
+          ) : (
+            <>
+              <Lock aria-hidden /> Log in
+            </>
+          )}
         </Button>
       </form>
       <p className="mt-7 text-center text-sm text-muted">
@@ -403,9 +415,17 @@ function RegisterPanel({ onLogin, onLock }: { onLogin: () => void; onLock: (v: b
         )}
         <div className="sm:col-span-2">
           <Button type="submit" size="lg" className="btn-shine w-full" disabled={loading || cooldown > 0}>
-            {loading && <Loader2 className="animate-spin" aria-hidden />}
-            {cooldown > 0 && !loading ? `Try again in ${cooldown}s` : "Register"}
-            {!loading && cooldown <= 0 && <ArrowRight aria-hidden />}
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" aria-hidden /> Creating account…
+              </>
+            ) : cooldown > 0 ? (
+              `Try again in ${cooldown}s`
+            ) : (
+              <>
+                Register <ArrowRight aria-hidden />
+              </>
+            )}
           </Button>
           <p className="mt-3 text-center text-xs text-subtle">We&apos;ll email you a link to verify your address before your account is activated.</p>
         </div>

@@ -62,6 +62,33 @@ async function register(body: unknown) {
   };
   const next = "/dashboard?verified=1";
 
+  // Fast-path: When service role is configured, generateLink creates the user directly in auth.users
+  // and issues the verification token in <700ms without waiting for Supabase's built-in mailer to time out or error.
+  if (serviceRoleConfigured()) {
+    const admin = supabaseAdmin();
+    const signup = await admin.auth.admin.generateLink({ type: "signup", email, password: d.password, options: { data: metadata } });
+    if (!signup.error && signup.data.properties?.hashed_token) {
+      return deliverLink(email, d.firstName, signup.data.properties.hashed_token, "signup", next);
+    }
+
+    if (signup.error && /already|registered|exists/i.test(signup.error.message)) {
+      // The address exists. Confirmed → tell them to log in; unconfirmed → refresh password + send a new link.
+      const { data: existing } = await admin.from("profiles").select("id").ilike("email", email).maybeSingle();
+      const user = existing?.id ? (await admin.auth.admin.getUserById(existing.id)).data.user : null;
+      if (!user || user.email_confirmed_at) {
+        return json({ ok: false, code: "ACCOUNT_EXISTS", error: "An account with this email already exists. Please log in instead." }, 409);
+      }
+      await admin.auth.admin.updateUserById(user.id, { password: d.password, user_metadata: metadata });
+      const magic = await admin.auth.admin.generateLink({ type: "magiclink", email });
+      if (magic.error) return json({ ok: false, error: friendly(magic.error.message) }, 400);
+      return deliverLink(email, d.firstName, magic.data.properties?.hashed_token, "magiclink", next);
+    } else if (signup.error) {
+      console.error("[register] generateLink failed:", signup.error.message);
+      return json({ ok: false, error: friendly(signup.error.message) }, 400);
+    }
+  }
+
+  // Fallback if service role is not configured:
   const supabase = await supabaseServer();
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -80,36 +107,8 @@ async function register(body: unknown) {
   if (error.status === 429) {
     return json({ ok: false, error: "Too many verification emails were sent. Please wait a minute and try again.", retryAfter: 60 }, 429);
   }
-  if (!isMailerFailure(error) || !serviceRoleConfigured()) {
-    console.error("[register] signUp failed:", error.message);
-    return json({ ok: false, error: friendly(error.message) }, 400);
-  }
-
-  // ── Fallback: Supabase couldn't send the email. Create the link ourselves. ──
-  console.warn("[register] Supabase could not send the verification email:", error.message, "— using fallback");
-  const admin = supabaseAdmin();
-  let hashedToken: string | undefined;
-
-  const signup = await admin.auth.admin.generateLink({ type: "signup", email, password: d.password, options: { data: metadata } });
-  if (!signup.error) {
-    hashedToken = signup.data.properties?.hashed_token;
-  } else if (/already|registered|exists/i.test(signup.error.message)) {
-    // The address exists. Confirmed → tell them to log in; unconfirmed → refresh password + send a new link.
-    const { data: existing } = await admin.from("profiles").select("id").ilike("email", email).maybeSingle();
-    const user = existing?.id ? (await admin.auth.admin.getUserById(existing.id)).data.user : null;
-    if (!user || user.email_confirmed_at) {
-      return json({ ok: false, code: "ACCOUNT_EXISTS", error: "An account with this email already exists. Please log in instead." }, 409);
-    }
-    await admin.auth.admin.updateUserById(user.id, { password: d.password, user_metadata: metadata });
-    const magic = await admin.auth.admin.generateLink({ type: "magiclink", email });
-    if (magic.error) return json({ ok: false, error: friendly(magic.error.message) }, 400);
-    hashedToken = magic.data.properties?.hashed_token;
-    return deliverLink(email, d.firstName, hashedToken, "magiclink", next);
-  } else {
-    console.error("[register] generateLink failed:", signup.error.message);
-    return json({ ok: false, error: friendly(signup.error.message) }, 400);
-  }
-  return deliverLink(email, d.firstName, hashedToken, "signup", next);
+  console.error("[register] signUp failed:", error.message);
+  return json({ ok: false, error: friendly(error.message) }, 400);
 }
 
 async function deliverLink(email: string, name: string, hashedToken: string | undefined, type: "signup" | "magiclink", next: string) {

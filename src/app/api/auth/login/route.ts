@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { getRepository } from "@/lib/db";
 import { supabaseServer } from "@/lib/supabase/server";
 import { loginSchema } from "@/lib/validation/auth";
@@ -31,7 +31,11 @@ export async function POST(req: Request) {
   }
 
   const user = data.user;
-  if (user) await getRepository().touchCustomerLogin(user.id).catch(() => {});
+  if (user) {
+    after(() => {
+      getRepository().touchCustomerLogin(user.id).catch(() => {});
+    });
+  }
   return NextResponse.json({
     ok: true,
     customer: { firstName: (user?.user_metadata?.first_name as string) ?? "", email: user?.email ?? email },

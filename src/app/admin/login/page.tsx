@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Lock } from "lucide-react";
 import { LogoMark } from "@/components/layout/logo";
@@ -15,17 +15,24 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const next = params.get("next");
+    router.prefetch(next && next.startsWith("/admin") ? next : "/admin");
+  }, [router, params]);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     const res = await fetch("/api/admin/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password }) });
     const json = await res.json().catch(() => ({}));
-    setLoading(false);
-    if (!res.ok) return setError(json.error || "Sign-in failed");
+    if (!res.ok) {
+      setLoading(false);
+      return setError(json.error || "Sign-in failed");
+    }
     const next = params.get("next");
-    router.replace(next && next.startsWith("/admin") ? next : "/admin");
-    router.refresh();
+    const dest = next && next.startsWith("/admin") ? next : "/admin";
+    window.location.assign(dest);
   };
 
   return (
@@ -43,7 +50,15 @@ function LoginForm() {
         )}
       </div>
       <Button type="submit" className="mt-6 w-full" disabled={loading}>
-        {loading ? <Loader2 className="animate-spin" aria-hidden /> : <Lock aria-hidden />} Sign in
+        {loading ? (
+          <>
+            <Loader2 className="animate-spin" aria-hidden /> Signing in…
+          </>
+        ) : (
+          <>
+            <Lock aria-hidden /> Sign in
+          </>
+        )}
       </Button>
     </form>
   );
