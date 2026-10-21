@@ -174,9 +174,9 @@ export function FileDropzone({ category = "other", onChange, onBusyChange, compa
           dragging ? "border-brand-600 bg-brand-50" : "border-line-strong bg-canvas/60 hover:border-brand-200",
         )}
       >
-        <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-white text-brand-600 shadow-[var(--shadow-soft)]">
+        <button type="button" onClick={() => inputRef.current?.click()} className="mx-auto grid size-12 cursor-pointer place-items-center rounded-2xl bg-white text-brand-600 shadow-[var(--shadow-soft)] transition-transform hover:scale-110 hover:shadow-md" aria-label={label}>
           <UploadCloud className="size-6" strokeWidth={1.75} aria-hidden />
-        </span>
+        </button>
         <p className="mt-4 font-semibold text-navy-900">
           <span className="hidden sm:inline">Drag & drop files here, or </span>
           <button type="button" onClick={() => inputRef.current?.click()} className="text-brand-600 underline-offset-4 hover:underline">
