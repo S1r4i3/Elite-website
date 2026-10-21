@@ -15,7 +15,7 @@ export const documentTypeLabel = (v: string | null | undefined) => documentTypes
 
 export const portalTaxYears = (() => {
   const y = new Date().getFullYear();
-  return [y - 1, y, y - 2, y - 3, y - 4].map(String);
+  return [y, y - 1, y - 2, y - 3, y - 4].map(String);
 })();
 
 export const draftStatusLabel = {
