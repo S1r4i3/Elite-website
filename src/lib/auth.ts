@@ -12,7 +12,13 @@ async function sha256(input: string) {
 export async function expectedAdminToken() {
   const pw = process.env.ADMIN_PASSWORD;
   if (!pw) return null;
-  return sha256(`${pw}:${process.env.SESSION_SECRET || "elite-tax-dev-secret"}`);
+  // Never sign admin cookies with a publicly known fallback in production.
+  const secret = process.env.SESSION_SECRET?.trim();
+  if (!secret || secret.length < 16) {
+    if (process.env.NODE_ENV === "production") return null;
+    return sha256(`${pw}:elite-tax-dev-secret`);
+  }
+  return sha256(`${pw}:${secret}`);
 }
 
 export async function isValidAdminToken(token: string | undefined) {
