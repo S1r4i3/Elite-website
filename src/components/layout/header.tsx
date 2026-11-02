@@ -11,6 +11,9 @@ import { Icon } from "@/components/ui/icon";
 import { mainNav, primaryCta } from "@/lib/navigation";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { hasAuthCookie } from "@/lib/auth-cookie";
+import { apiJson } from "@/lib/api-client";
+import { signOut } from "@/lib/sign-out";
 
 export function Header() {
   const pathname = usePathname();
@@ -21,16 +24,29 @@ export function Header() {
   const navRef = useRef<HTMLElement>(null);
   const [account, setAccount] = useState<Account>(null);
 
+  // Who's signed in. Anonymous visitors (no Supabase session cookie) make no request at all;
+  // signed-in visitors ask once, and again only when the session cookie appears/disappears
+  // (e.g. right after login or logout) — not on every page change as before.
+  const knownSession = useRef<boolean | null>(null);
   useEffect(() => {
+    const has = hasAuthCookie();
+    if (has === knownSession.current) return;
+    knownSession.current = has;
+    if (!has) {
+      setAccount(null);
+      return;
+    }
     let cancelled = false;
-    fetch("/api/auth/me", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => !cancelled && setAccount(j?.customer ?? null))
-      .catch(() => {});
+    apiJson<{ customer: Account }>("/api/auth/me", { cache: "no-store" }, 8_000)
+      .then((j) => !cancelled && setAccount(j.customer ?? null))
+      .catch(() => {
+        knownSession.current = null; // try again on the next navigation
+      });
     return () => {
       cancelled = true;
     };
   }, [pathname]);
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -260,8 +276,11 @@ export function Header() {
                 size="lg"
                 className="w-full text-danger-600"
                 tabIndex={mobileOpen ? 0 : -1}
+                loading={signingOut}
+                loadingText="Signing out…"
                 onClick={async () => {
-                  await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+                  setSigningOut(true);
+                  if (!(await signOut())) return setSigningOut(false);
                   setAccount(null);
                   setMobileOpen(false);
                   window.location.href = "/";

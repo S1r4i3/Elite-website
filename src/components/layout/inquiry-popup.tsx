@@ -7,6 +7,7 @@ import { CheckCircle2, Loader2, Mail, MessageCircle, Phone, Send, User, X } from
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { site } from "@/lib/site";
+import { apiJson } from "@/lib/api-client";
 
 const KEY = "ebt:inquiry-popup"; // "sent" once the visitor subscribes
 const FIRST_DELAY = 5_000; // first appearance: 5 seconds
@@ -64,16 +65,20 @@ export function InquiryPopup() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (busy) return;
     setBusy(true);
     setError(null);
-    const res = await fetch("/api/inquiries", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name, phone, email, message, page: pathname, website: hp }),
-    }).catch(() => null);
-    const json = res ? await res.json().catch(() => ({})) : {};
-    setBusy(false);
-    if (!res || !res.ok) return setError(json.error || "Something went wrong. Please try again.");
+    try {
+      await apiJson("/api/inquiries", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name, phone, email, message, page: pathname, website: hp }),
+      });
+    } catch (err) {
+      return setError((err as Error).message || "Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
+    }
     setSent(true);
     track("contact_form_submit", { form: "inquiry", page: pathname });
     subscribed.current = true;

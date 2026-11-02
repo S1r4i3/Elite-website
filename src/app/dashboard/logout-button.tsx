@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut } from "@/lib/sign-out";
 
 export function LogoutButton({ className }: { className?: string }) {
   const router = useRouter();
@@ -12,9 +13,11 @@ export function LogoutButton({ className }: { className?: string }) {
     <button
       type="button"
       disabled={busy}
+      aria-busy={busy || undefined}
       onClick={async () => {
+        if (busy) return;
         setBusy(true);
-        await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+        if (!(await signOut())) return setBusy(false);
         router.replace("/login");
         router.refresh();
       }}

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
 import { DocActions } from "./doc-actions";
 import { StatusBadge } from "./status-badge";
+import { apiJson } from "@/lib/api-client";
+import { toast } from "@/components/ui/toaster";
 import { cn, formatBytes } from "@/lib/utils";
 
 type Draft = {
@@ -28,16 +30,21 @@ export function DraftCard({ draft }: { draft: Draft }) {
   const [error, setError] = useState<string | null>(null);
 
   const act = async (action: "approve" | "request_changes") => {
+    if (busy) return;
     setBusy(action === "approve" ? "approve" : "changes");
     setError(null);
-    const res = await fetch(`/api/me/drafts/${draft.id}`, {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(action === "approve" ? { action } : { action, comment }),
-    });
-    const json = await res.json().catch(() => ({}));
-    setBusy(null);
-    if (!res.ok) return setError(json.error || "Something went wrong.");
+    try {
+      await apiJson(`/api/me/drafts/${draft.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(action === "approve" ? { action } : { action, comment }),
+      });
+    } catch (e) {
+      return setError((e as Error).message || "Something went wrong.");
+    } finally {
+      setBusy(null);
+    }
+    toast.success(action === "approve" ? "Draft approved — we'll prepare your return for filing." : "Thanks — your requested changes were sent.");
     setMode("idle");
     setComment("");
     router.refresh();

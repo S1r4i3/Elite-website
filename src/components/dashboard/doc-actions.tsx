@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Download, Eye, Loader2, Trash2 } from "lucide-react";
+import { apiJson } from "@/lib/api-client";
+import { toast } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 
 const viewable = (name: string) => /\.(pdf|png|jpe?g)$/i.test(name);
@@ -28,12 +30,21 @@ export function DocActions({ id, name, canDelete = false, className }: { id: str
             <button
               type="button"
               disabled={busy}
+              aria-busy={busy || undefined}
               onClick={async () => {
+                if (busy) return;
                 setBusy(true);
-                await fetch(`/api/me/documents/${id}`, { method: "DELETE" }).catch(() => {});
-                setBusy(false);
-                setConfirm(false);
-                router.refresh();
+                try {
+                  await apiJson(`/api/me/documents/${id}`, { method: "DELETE" });
+                  toast.success(`${name} deleted.`);
+                  setConfirm(false);
+                  router.refresh();
+                } catch (e) {
+                  // Previously a failed delete looked like success — now the file stays and the visitor is told why.
+                  toast.error((e as Error).message || "Couldn't delete the file. Please try again.");
+                } finally {
+                  setBusy(false);
+                }
               }}
               className={cn(btn, "bg-danger-600 text-white hover:bg-danger-600/90")}
             >

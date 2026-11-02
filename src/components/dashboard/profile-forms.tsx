@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, KeyRound, Loader2, Save } from "lucide-react";
+import { CheckCircle2, KeyRound, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/auth/auth-form";
+import { apiJson } from "@/lib/api-client";
+import { toast } from "@/components/ui/toaster";
 
 type Profile = { firstName: string; lastName: string; email: string; phone: string; dob: string; state: string; country: string; address: string };
 
@@ -35,14 +37,20 @@ export function ProfileForm({ initial }: { initial: Profile }) {
       className="card p-6"
       onSubmit={async (e) => {
         e.preventDefault();
+        if (busy) return;
         setBusy(true);
         setMsg(null);
         const { email: _e, ...body } = v;
-        const res = await fetch("/api/me/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-        const json = await res.json().catch(() => ({}));
-        setBusy(false);
-        setMsg(res.ok ? { ok: true, text: "Profile saved." } : { ok: false, text: json.error || "Couldn't save." });
-        if (res.ok) router.refresh();
+        try {
+          await apiJson("/api/me/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+          setMsg({ ok: true, text: "Profile saved." });
+          toast.success("Profile saved.");
+          router.refresh();
+        } catch (err) {
+          setMsg({ ok: false, text: (err as Error).message || "Couldn't save." });
+        } finally {
+          setBusy(false);
+        }
       }}
     >
       <h2 className="text-lg font-bold">Personal details</h2>
@@ -60,8 +68,8 @@ export function ProfileForm({ initial }: { initial: Profile }) {
         {field("address", "Address")}
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <Button type="submit" disabled={busy}>
-          {busy ? <Loader2 className="animate-spin" aria-hidden /> : <Save aria-hidden />} Save changes
+        <Button type="submit" loading={busy} loadingText="Saving…">
+          <Save aria-hidden /> Save changes
         </Button>
         <Msg m={msg} />
       </div>
@@ -80,16 +88,21 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
       className="card p-6"
       onSubmit={async (e) => {
         e.preventDefault();
+        if (busy) return;
         setBusy(true);
         setMsg(null);
-        const res = await fetch("/api/me/password", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ currentPassword: cur, newPassword: pw, confirmPassword: cf }),
-        });
-        const json = await res.json().catch(() => ({}));
-        setBusy(false);
-        if (!res.ok) return setMsg({ ok: false, text: json.error || "Couldn't update password." });
+        try {
+          await apiJson("/api/me/password", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ currentPassword: cur, newPassword: pw, confirmPassword: cf }),
+          });
+        } catch (err) {
+          return setMsg({ ok: false, text: (err as Error).message || "Couldn't update password." });
+        } finally {
+          setBusy(false);
+        }
+        toast.success("Password updated.");
         setCur("");
         setPw("");
         setCf("");
@@ -115,8 +128,8 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
         </div>
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <Button type="submit" variant="dark" disabled={busy}>
-          {busy ? <Loader2 className="animate-spin" aria-hidden /> : <KeyRound aria-hidden />} Update password
+        <Button type="submit" variant="dark" loading={busy} loadingText="Updating…">
+          <KeyRound aria-hidden /> Update password
         </Button>
         <Msg m={msg} />
       </div>

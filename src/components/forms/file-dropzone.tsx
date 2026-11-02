@@ -28,6 +28,11 @@ type Props = {
   onUploaded?: (id: string) => void;
 };
 
+import { apiFetch } from "@/lib/api-client";
+
+/** A 15 MB file on a slow mobile line can take a while, but a stalled upload must always end. */
+const UPLOAD_TIMEOUT_MS = 5 * 60_000;
+
 /** PUT a file to a Supabase signed upload URL, with progress. */
 function putToStorage(url: string, file: File, onProgress: (p: number) => void) {
   return new Promise<void>((resolve, reject) => {
@@ -40,6 +45,8 @@ function putToStorage(url: string, file: File, onProgress: (p: number) => void) 
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.min(99, Math.round((e.loaded / e.total) * 100)));
     xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Upload failed — please try again")));
     xhr.onerror = () => reject(new Error("Network error — check your connection"));
+    xhr.timeout = UPLOAD_TIMEOUT_MS;
+    xhr.ontimeout = () => reject(new Error("The upload timed out — check your connection and try again"));
     xhr.send(body);
   });
 }
@@ -50,7 +57,7 @@ function putToStorage(url: string, file: File, onProgress: (p: number) => void) 
  */
 async function uploadFile(file: File, category: string, onProgress: (p: number) => void, endpoint = "/api/uploads", extra: Record<string, string> = {}) {
   if (endpoint === "/api/me/documents") {
-    const sign = await fetch("/api/me/documents/sign", {
+    const sign = await apiFetch("/api/me/documents/sign", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: file.name, size: file.size }),
@@ -58,7 +65,7 @@ async function uploadFile(file: File, category: string, onProgress: (p: number) 
     const s = await sign.json().catch(() => ({}));
     if (sign.ok && s.ok) {
       await putToStorage(s.signedUrl, file, onProgress);
-      const res = await fetch(endpoint, {
+      const res = await apiFetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ key: s.key, name: file.name, category, ...extra }),
@@ -91,6 +98,8 @@ function uploadViaApi(file: File, category: string, onProgress: (p: number) => v
       }
     };
     xhr.onerror = () => reject(new Error("Network error — check your connection"));
+    xhr.timeout = UPLOAD_TIMEOUT_MS;
+    xhr.ontimeout = () => reject(new Error("The upload timed out — check your connection and try again"));
     xhr.send(body);
   });
 }

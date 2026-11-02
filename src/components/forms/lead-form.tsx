@@ -12,6 +12,7 @@ import { Input, NativeSelect, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { site } from "@/lib/site";
+import { apiFetch } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -73,10 +74,11 @@ export function LeadForm({ defaultService, source, estimate, submitLabel = "Subm
 
 
   const onSubmit = async (data: LeadData) => {
+    if (status === "submitting") return;
     setStatus("submitting");
     setServerError(null);
     try {
-      const res = await fetch("/api/leads", {
+      const res = await apiFetch("/api/leads", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...data, source: source ?? (typeof window !== "undefined" ? window.location.pathname : undefined), estimate }),

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, LayoutDashboard, Loader2, LogIn, LogOut, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut as endSession } from "@/lib/sign-out";
 
 export type Account = { firstName: string; lastName?: string; email: string } | null;
 
@@ -44,9 +45,11 @@ export function AccountMenu({ account, onSignedOut }: { account: Account; onSign
   const initials = `${account.firstName[0] ?? ""}${account.lastName?.[0] ?? ""}`.toUpperCase() || "U";
 
   const signOut = async () => {
+    if (busy) return;
     setBusy(true);
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    const ok = await endSession();
     setBusy(false);
+    if (!ok) return;
     setOpen(false);
     onSignedOut();
     router.push("/");

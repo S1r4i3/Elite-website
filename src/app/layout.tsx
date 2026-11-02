@@ -4,6 +4,7 @@ import "./globals.css";
 import { RevealObserver } from "@/components/layout/reveal";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Analytics } from "@/components/seo/analytics";
+import { Toaster } from "@/components/ui/toaster";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <RevealObserver />
+        <Toaster />
         <Analytics />
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />

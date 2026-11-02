@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { OtpInput } from "./otp-input";
 import { loginSchema, registerSchema, type LoginInput, type RegisterInput } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api-client";
+import { hasAuthCookie } from "@/lib/auth-cookie";
 
 export type AuthTab = "login" | "register";
 
@@ -55,11 +57,12 @@ PasswordInput.displayName = "PasswordInput";
 
 async function postJson(url: string, body: unknown) {
   try {
-    const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    // 20 s timeout: a stalled request always ends with a clear message and the button comes back.
+    const res = await apiFetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
     const json = await res.json().catch(() => ({}));
     return { ok: res.ok, json } as { ok: boolean; json: { error?: string; code?: string; retryAfter?: number; devCode?: string; devLink?: string } };
-  } catch {
-    return { ok: false, json: { error: "Network error. Please check your connection and try again." } };
+  } catch (e) {
+    return { ok: false, json: { error: (e as Error).message || "Network error. Please check your connection and try again." } };
   }
 }
 
@@ -261,7 +264,9 @@ function RegisterPanel({ onLogin, onLock }: { onLogin: () => void; onLock: (v: b
   useEffect(() => {
     if (step !== "sent") return;
     const t = setInterval(async () => {
-      const me = await fetch("/api/auth/me", { cache: "no-store" }).then((r) => r.json()).catch(() => null);
+      // No session cookie yet → the link hasn't been opened in this browser; skip the server round-trip.
+      if (!hasAuthCookie()) return;
+      const me = await apiFetch("/api/auth/me", { cache: "no-store" }, 8_000).then((r) => r.json()).catch(() => null);
       if (me?.customer) {
         clearInterval(t);
         router.replace("/dashboard?verified=1");
