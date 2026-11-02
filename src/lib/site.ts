@@ -9,8 +9,10 @@ import { SITE_URL } from "./site-url";
 export const site = {
   name: "Elite B Tax Services",
   shortName: "Elite B Tax",
+  /** Site name Google shows above results (WebSite schema + og:site_name). One word, like the domain. */
+  siteName: "Elitebtax",
   /** Other names people search for. */
-  alternateNames: ["Elite B Tax", "EliteBTax", "Elite Tax Services", "EBT Tax"],
+  alternateNames: ["Elitebtax", "elitebtax.com", "Elite B Tax", "Elite B Tax Services", "EliteBTax", "Elite Tax Services", "EBT Tax"],
   logo: "/brand/ebt-logo.png",
   mark: "/brand/ebt-mark.png",
   legalName: "EliteBridge Tech Inc",

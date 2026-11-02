@@ -93,8 +93,9 @@ export function websiteSchema() {
     "@type": "WebSite",
     "@id": absoluteUrl("/#website"),
     url: site.url,
-    name: site.name,
-    alternateName: site.alternateNames,
+    // Google's preferred site name comes from here (homepage WebSite schema).
+    name: site.siteName,
+    alternateName: site.alternateNames.filter((n) => n !== site.siteName),
     description: site.description,
     inLanguage: "en-US",
     publisher: { "@id": absoluteUrl("/#organization") },

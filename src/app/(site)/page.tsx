@@ -1,3 +1,4 @@
+import { site } from "@/lib/site";
 import type { Metadata } from "next";
 import { LatestGuides } from "@/components/sections/latest-guides";
 import { Hero } from "@/components/sections/hero";
@@ -17,14 +18,16 @@ import { absoluteUrl } from "@/lib/utils";
 const ServiceFinder = dynamic(() => import("@/components/sections/service-finder").then((m) => m.ServiceFinder));
 
 const homeDescription =
-  "Elite B Tax Services: U.S. federal & state tax filing, FBAR, FATCA, ITIN, IRS notices, business tax and NRI tax help. Online, secure, done right.";
+  "Elitebtax (Elite B Tax Services): U.S. federal & state tax filing, FBAR, FATCA, ITIN, IRS notices, business tax and NRI tax help. Online, secure, done right.";
 
 export const metadata: Metadata = {
+  // Homepage title leads with the one-word brand people type: "Elitebtax".
+  title: { absolute: `${site.siteName} — ${site.name} | U.S. & India Tax Filing, FBAR, ITIN` },
   description: homeDescription,
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
     type: "website",
-    siteName: "Elite B Tax Services",
+    siteName: site.siteName,
     locale: "en_US",
     url: absoluteUrl("/"),
     description: homeDescription,

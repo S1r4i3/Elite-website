@@ -15,7 +15,7 @@ const manrope = localFont({ src: "./fonts/manrope-var.woff2", variable: "--font-
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} | U.S. & India Tax Filing, FBAR, ITIN`,
+    default: `${site.siteName} — ${site.name} | U.S. & India Tax Filing, FBAR, ITIN`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   publisher: site.legalName,
   category: "Finance",
   alternates: { canonical: site.url },
-  openGraph: { type: "website", siteName: site.name, locale: "en_US", url: site.url },
+  openGraph: { type: "website", siteName: site.siteName, locale: "en_US", url: site.url },
   appleWebApp: { capable: true, title: site.shortName, statusBarStyle: "black-translucent" },
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
