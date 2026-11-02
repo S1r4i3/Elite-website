@@ -109,7 +109,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 text-[13px] text-white/50 md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} Elite B Tax Services. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Elitebtax (Elite B Tax Services) · elitebtax.com. All rights reserved.</p>
         </div>
       </div>
     </footer>

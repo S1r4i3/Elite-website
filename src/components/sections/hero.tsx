@@ -21,7 +21,7 @@ export function Hero() {
           {/* The H1 carries the search terms; the slogan below keeps the big visual line. */}
           <h1 className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[13px] font-medium text-white/80 backdrop-blur">
             <span className="size-2 rounded-full bg-brand-500 shadow-[0_0_0_3px_rgb(227_25_47/0.25)]" aria-hidden />
-            Elite B Tax Services — U.S. tax filing for individuals, NRIs & small businesses
+            Elitebtax · Elite B Tax Services — U.S. tax filing for individuals, NRIs & small businesses
           </h1>
           <p className="mt-6 font-display text-[40px] tracking-tight font-extrabold leading-[1.04] text-white sm:text-6xl lg:text-[64px]">
             Your Taxes. Done Right.{" "}
