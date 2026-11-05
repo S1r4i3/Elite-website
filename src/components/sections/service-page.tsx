@@ -11,6 +11,7 @@ import { FinalCta } from "./final-cta";
 import { ServiceCard } from "./service-card";
 import { TrustStats } from "./trust-stats";
 import { SectionHeader } from "./section-header";
+import { DocumentChecklist } from "./document-checklist";
 import { LeadForm } from "@/components/forms/lead-form";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Icon } from "@/components/ui/icon";
@@ -114,7 +115,7 @@ export function ServicePage({ service }: { service: Service }) {
       {/* Who needs it + documents */}
       <section className="section-y bg-canvas">
         <div className="container-x grid gap-6 lg:grid-cols-2">
-          <div className="card p-6 sm:p-8" data-reveal>
+          <div className="card flex flex-col p-6 sm:p-8" data-reveal>
             <span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-600">
               <UserCheck className="size-5" aria-hidden />
             </span>
@@ -126,20 +127,22 @@ export function ServicePage({ service }: { service: Service }) {
                 </li>
               ))}
             </ul>
+            <div className="mt-auto pt-6">
+              <div className="rounded-2xl border border-brand-100 bg-brand-50/60 p-4">
+                <p className="text-sm font-semibold text-navy-900">Not sure this applies to you?</p>
+                <p className="mt-1 text-[13px] leading-relaxed text-muted">Tell us your situation and we&apos;ll confirm what you need to file — no obligation.</p>
+                <a href="#get-started" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700">
+                  Check my situation <ArrowRight className="size-4" aria-hidden />
+                </a>
+              </div>
+            </div>
           </div>
           <div className="card p-6 sm:p-8" data-reveal>
             <span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-600">
               <FileCheck2 className="size-5" aria-hidden />
             </span>
             <h2 className="mt-5 text-2xl font-extrabold">Documents to have ready</h2>
-            <ul className="mt-5 space-y-3">
-              {service.documents.map((d) => (
-                <li key={d} className="flex items-start gap-3 text-[15px] text-ink">
-                  <span className="mt-0.5 grid size-4 shrink-0 place-items-center rounded border border-line-strong" aria-hidden />
-                  {d}
-                </li>
-              ))}
-            </ul>
+            <DocumentChecklist items={service.documents} />
             <p className="mt-5 text-[13px] text-muted">Don&apos;t have everything? Start anyway — we&apos;ll tell you exactly what&apos;s missing.</p>
           </div>
         </div>

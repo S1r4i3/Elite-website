@@ -848,6 +848,8 @@ export const services: Service[] = [
       "NRIs in the U.S. with income from India",
       "H-1B and green card holders with Indian bank accounts or property",
       "Returning Indians and people with residency changes",
+      "U.S. citizens and OCI card holders with income or property in India",
+      "Anyone selling property or investments in India — often to reclaim excess TDS",
       "Residents of India with tax filing obligations",
     ],
     process: standardProcess(
@@ -861,6 +863,9 @@ export const services: Service[] = [
       "Rental income and property sale documents",
       "Mutual fund and share capital gains statements",
       "Passport and travel dates (for residency status)",
+      "Tax Residency Certificate (TRC) and Form 10F — to claim India–U.S. treaty (DTAA) benefits",
+      "Indian bank account number and IFSC (for your refund)",
+      "Your U.S. tax return or W-2 (to coordinate the foreign tax credit)",
     ],
     faqs: [
       { q: "Do NRIs need to file an Indian tax return?", a: "Generally, if your taxable Indian income exceeds the basic exemption limit, or if you want to claim a refund of excess TDS, you should file. We'll review your situation." },
